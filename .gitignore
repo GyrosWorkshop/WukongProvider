@@ -1,0 +1,7 @@
+node_modules/
+typings/
+lib/
+server-config.json
+npm-debug.log
+*.swp
+.vscode/.browse.VC.db*

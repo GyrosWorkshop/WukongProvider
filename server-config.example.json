@@ -1,0 +1,10 @@
+{
+    "port": 3120,
+    "provider": ["QQMusic", "netease-cloud-music"],
+    "netease-cloud-music-api-prefix": "http://music.163.com",
+    "netease-cloud-music-bin-cdn": null,
+    "Groove": {
+      "ClientId": "",
+      "ClientSecret": ""
+    }
+}

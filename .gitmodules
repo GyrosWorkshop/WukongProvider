@@ -1,0 +1,3 @@
+[submodule "WukongDefinitions"]
+	path = WukongDefinitions
+	url = git@github.com:GyrosWorkshop/WukongDefinitions.git

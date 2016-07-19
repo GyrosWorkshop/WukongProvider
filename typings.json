@@ -1,0 +1,27 @@
+{
+  "name": "wukong-provider-service",
+  "globalDependencies": {
+    "body-parser": "registry:dt/body-parser#0.0.0+20160619023215",
+    "chai": "registry:dt/chai#3.4.0+20160601211834",
+    "core-decorators": "registry:dt/core-decorators#0.10.0+20160316155526",
+    "crypto-js": "registry:dt/crypto-js#3.1.4+20160708041433",
+    "express": "registry:dt/express#4.0.0+20160317120654",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160701212727",
+    "form-data": "registry:dt/form-data#0.0.0+20160316155526",
+    "html-entities": "registry:dt/html-entities#1.2.0+20160412134357",
+    "jquery": "registry:dt/jquery#1.10.0+20160704162008",
+    "jsdom": "registry:dt/jsdom#2.0.0+20160316155526",
+    "lodash": "registry:dt/lodash#3.10.0+20160619033623",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
+    "mocha": "registry:dt/mocha#2.2.5+20160619032855",
+    "node": "registry:env/node#6.0.0+20160622202520",
+    "node-cache": "registry:dt/node-cache#3.0.0+20160317120654",
+    "request": "registry:dt/request#0.0.0+20160524135346",
+    "request-promise": "registry:dt/request-promise#3.0.0+20160628092802",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157",
+    "sqlite3": "registry:dt/sqlite3#2.2.3+20160316155526"
+  },
+  "dependencies": {
+    "sequelize": "registry:npm/sequelize#3.0.0+20160706040828"
+  }
+}
