@@ -4,13 +4,9 @@ import {join} from 'path'
 const sequelize = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
     dialect: 'sqlite',
-    pool: {
-        maxConnections: 5,
-        minConnections: 0,
-        maxIdleTime: 10000
-    },
     storage: join(__dirname, '..', 'storage/sqlite.db'),
-    logging: false
+    logging: false,
+    native: true
 })
 export default sequelize
 
