@@ -1,6 +1,7 @@
 import NeteaseCloudMusicProvider from './providers/NeteaseCloudMusic'
 import QQMusicProvider from './providers/QQMusic'
 import GrooveProvider from './providers/Groove'
+import XiamiProvider from './providers/Xiami'
 import BaseMusicProvider from './providers/Base'
 import * as _ from 'lodash'
 import * as express from 'express'
@@ -14,9 +15,14 @@ app.use(bodyParser.json())
 http.createServer(app).listen(process.env.port || 3120)
 
 const providers = new Map<string, BaseMusicProvider>()
-providers.set(QQMusicProvider.providerName, new QQMusicProvider())
+const qqProvider = new QQMusicProvider()
+const neteaseProvider = new NeteaseCloudMusicProvider()
+const xiamiProvider = new XiamiProvider()
+
+providers.set(qqProvider.providerName, qqProvider)
 // providers.set(GrooveProvider.providerName, new GrooveProvider())
-providers.set(NeteaseCloudMusicProvider.providerName, new NeteaseCloudMusicProvider())
+providers.set(neteaseProvider.providerName, neteaseProvider)
+// providers.set(xiamiProvider.providerName, xiamiProvider)
 
 @autobind
 class Controller {

@@ -11,7 +11,7 @@ abstract class BaseMusicProvider {
     /**
      * set provider name, eg: netease-cloud-music
      */
-    static providerName: string
+    abstract get providerName()
 
     protected RequestOptions: Request.CoreOptions = {
         headers: {
@@ -58,7 +58,7 @@ abstract class BaseMusicProvider {
         return await Song.findOne({
             where: {
                 songId: songId,
-                siteId: BaseMusicProvider.providerName
+                siteId: this.providerName
             },
             include: [
                 {
@@ -76,3 +76,4 @@ abstract class BaseMusicProvider {
 }
 
 export default BaseMusicProvider
+export {Request}

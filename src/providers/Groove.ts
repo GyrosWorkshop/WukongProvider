@@ -5,7 +5,9 @@ const serverConfig = require('../../server-config.json')
 
 @autobind
 export default class GrooveProvider extends BaseProvider {
-    static providerName = 'Groove'
+    get providerName() {
+        return 'Groove'
+    }
     private oauthUrl = 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13'
 
     async getAccessToken(): Promise<string> {
@@ -80,7 +82,7 @@ export default class GrooveProvider extends BaseProvider {
         console.log(data.Artists)
         song.artist = data.Artists[0].Artist.Name
         song.title = data.Name
-        song.siteId = GrooveProvider.providerName
+        song.siteId = this.providerName
         song.songId = data.Id
         song.file = ''
         song.artwork = data.ImageUrl

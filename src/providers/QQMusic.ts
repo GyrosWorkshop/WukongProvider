@@ -8,7 +8,9 @@ import * as jsdom from 'jsdom'
 
 @autobind
 export default class QQMusicProvider extends BaseProvider {
-    static providerName = 'QQMusic'
+    get providerName() {
+        return 'QQMusic' 
+    }
 
     constructor() {
         super()
@@ -96,7 +98,7 @@ export default class QQMusicProvider extends BaseProvider {
         song.artist = baseInfo.singer.map((it: any) => it.name).join(', ')
         song.title = baseInfo.songname
         song.length = Math.floor(parseFloat(baseInfo.interval) * 1000)
-        song.siteId = QQMusicProvider.providerName
+        song.siteId = this.providerName
         song.songId = songId
         song.file = ''
         song.artwork = this.getArtworkUrl(baseInfo.albummid)
@@ -119,7 +121,7 @@ export default class QQMusicProvider extends BaseProvider {
         song.artist = data.fsinger
         song.title = f[1]
         song.length = Math.floor(parseFloat(f[7]) * 1000)
-        song.siteId = QQMusicProvider.providerName
+        song.siteId = this.providerName
         song.songId = f[20]
         song.file = ''
         song.artwork = this.getArtworkUrl(imgId)

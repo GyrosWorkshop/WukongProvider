@@ -7,7 +7,9 @@ const serverConfig = require('../../server-config.json')
 const bigint = require('BigInt')
 
 class NeteaseCloudMusicProvider extends BaseMusicProvider {
-    static providerName = 'netease-cloud-music'
+    get providerName() {
+        return 'netease-cloud-music'
+    } 
     static apiPrefix = serverConfig['netease-cloud-music-api-prefix']
     static binCdn = serverConfig['netease-cloud-music-bin-cdn']
     static imageSize = 400
@@ -132,7 +134,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             }
             let songLength = o.duration
             return {
-                siteId: NeteaseCloudMusicProvider.providerName,
+                siteId: this.providerName,
                 songId: o.id.toString(),
                 title: o.name,
                 file: musicUrl,
@@ -173,7 +175,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             let songLength = o.dt
             if (musicAvail) {
                 return {
-                    siteId: NeteaseCloudMusicProvider.providerName,
+                    siteId: this.providerName,
                     songId: o.id.toString(),
                     title: o.name,
                     file: null,
