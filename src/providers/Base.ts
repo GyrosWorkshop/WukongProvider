@@ -63,7 +63,7 @@ abstract class BaseMusicProvider {
             include: [
                 {
                     model: Lyric,
-                    as: 'lyric'
+                    as: 'lyrics'
                 }
             ]
         }) as any

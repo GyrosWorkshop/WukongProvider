@@ -9,7 +9,7 @@ const bigint = require('BigInt')
 class NeteaseCloudMusicProvider extends BaseMusicProvider {
     get providerName() {
         return 'netease-cloud-music'
-    } 
+    }
     static apiPrefix = serverConfig['netease-cloud-music-api-prefix']
     static binCdn = serverConfig['netease-cloud-music-bin-cdn']
     static imageSize = 400
