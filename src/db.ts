@@ -11,7 +11,7 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 export default sequelize
 
 export const Lyric = sequelize.define('lyric', {
-    withTimeLine: Sequelize.BOOLEAN,
+    withTimeline: Sequelize.BOOLEAN,
     translate: Sequelize.BOOLEAN,
     lyric: Sequelize.STRING
 }, {
