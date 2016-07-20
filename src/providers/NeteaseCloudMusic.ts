@@ -115,9 +115,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 albumPicId = o.album && o.album.picId
             if (albumPicId) {
                 albumUrl = `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(albumPicId)}/${albumPicId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
-                if (NeteaseCloudMusicProvider.binCdn) {
-                    albumUrl = albumUrl.replace(/http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
-                }
             }
             let musicUrl = o.mp3Url
             let musicUrlDomain = musicUrl ? /http:\/\/(.+?)\//.exec(musicUrl)[0] : 'http://m2.music.126.net/'
@@ -153,9 +150,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 albumPicId = o.al && o.al.pic_str
             if (albumPicId) {
                 albumUrl = `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(albumPicId)}/${albumPicId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
-                if (NeteaseCloudMusicProvider.binCdn) {
-                    albumUrl = albumUrl.replace(/http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
-                }
             }
             let musicUrl: string
             let musicUrlDomain = musicUrl ? /http:\/\/(.+?)\//.exec(musicUrl)[0] : 'http://m2.music.126.net/'
