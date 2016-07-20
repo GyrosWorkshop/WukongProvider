@@ -119,3 +119,5 @@ class Controller {
 }
 
 new Controller(app)
+
+module.exports = app
