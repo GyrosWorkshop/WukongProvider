@@ -9,7 +9,7 @@
     "start": "node lib/index.js",
     "build": "tsc --rootDir src --outDir lib",
     "lint": "jake lint -- --trace",
-    "typings": "typings install",
+    "typings": "typings prune && typings install",
     "doc": "apidoc -i src/ -o apidoc/"
   },
   "repository": {
