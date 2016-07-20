@@ -75,7 +75,7 @@ describe('API', () => {
         })
         assert.isString(res.file)
     })
-    it('get info QQ', async () => {
+    it('get url QQ', async () => {
         const res = await rp({
             url: 'http://localhost:3120/api/songInfo',
             method: 'POST',
