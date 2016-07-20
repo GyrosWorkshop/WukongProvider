@@ -11,7 +11,7 @@ abstract class BaseMusicProvider {
     /**
      * set provider name, eg: netease-cloud-music
      */
-    abstract get providerName()
+    abstract get providerName(): string
 
     protected RequestOptions: Request.CoreOptions = {
         headers: {
