@@ -51,7 +51,7 @@ export const Song = sequelize.define('song', {
 })
 
 Song.hasMany(Lyric, {
-    as: 'lyric'
+    as: 'lyrics'
 })
 
 async function init() {
