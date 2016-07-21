@@ -22,7 +22,7 @@ const xiamiProvider = new XiamiProvider()
 providers.set(qqProvider.providerName, qqProvider)
 // providers.set(GrooveProvider.providerName, new GrooveProvider())
 providers.set(neteaseProvider.providerName, neteaseProvider)
-// providers.set(xiamiProvider.providerName, xiamiProvider)
+providers.set(xiamiProvider.providerName, xiamiProvider)
 
 @autobind
 class Controller {

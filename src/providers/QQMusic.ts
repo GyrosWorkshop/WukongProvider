@@ -53,7 +53,7 @@ export default class QQMusicProvider extends BaseProvider {
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
         // Fixme: get music from baseinfo API.
-        let song = await this.load(songId)
+        let song: Wukong.ISong = await this.load(songId)
         if (!song) {
             song = await this.getSingleSongOnline(songId)
             await this.save(song)

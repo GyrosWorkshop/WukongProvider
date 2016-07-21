@@ -16,7 +16,8 @@ export default class XiamiMusicProvider extends BaseProvider {
         if (!keywords) return []
         const token = await this.getXiamiToken()
         const songs = await this.searchSongsOnlne(token, keywords)
-        await this.bulkSave(songs)
+        const data = songs.map(it => Object.assign(it, {meta: JSON.stringify({url: it.file})}))
+        await this.bulkSave(data)
         return songs
     }
 
@@ -25,7 +26,7 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     public async getPlayingUrl(songId: string, overseas: boolean): Promise<string> {
-        return (await this.getSongInfo(songId)).file
+        return JSON.parse((await this.load(songId)).meta).url
     }
 
     private async searchSongsOnlne(token: string, key: string): Promise<Array<Wukong.ISong>> {

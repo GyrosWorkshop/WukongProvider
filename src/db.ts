@@ -40,7 +40,8 @@ export const Song = sequelize.define('song', {
     album: Sequelize.STRING,
     artwork: Sequelize.STRING,
     length: Sequelize.INTEGER,
-    bitrate: Sequelize.INTEGER
+    bitrate: Sequelize.INTEGER,
+    meta: Sequelize.STRING
 }, {
     indexes: [
         {

@@ -30,15 +30,25 @@ abstract class BaseMusicProvider {
      * Currently only new one created. (update not available)
      */
     protected async save(song: Wukong.ISong): Promise<void> {
-        let dbSong = await Song.findOrCreate({
+        let dbSong = await Song.findOne({
             where: {
                 songId: song.songId,
                 siteId: song.siteId
-            },
-            defaults: song
+            }
         }) as any
+        if (dbSong) {
+            await Song.update(song, {
+                where: {
+                    songId: song.songId,
+                    siteId: song.siteId
+                }
+            })
+        } else {
+            dbSong = await Song.create(song);
+        }
+
         if (song.lyrics) {
-            const songKey = dbSong[0].getDataValue('id')
+            const songKey = dbSong.getDataValue('id')
             await Lyric.destroy({
                 where: {
                     songId: songKey
@@ -54,7 +64,7 @@ abstract class BaseMusicProvider {
         })
     }
 
-    protected async load(songId: string): Promise<Wukong.ISong> {
+    protected async load(songId: string): Promise<Wukong.ISong & {meta: string}> {
         const data = await Song.findOne({
             where: {
                 songId: songId,
