@@ -5,6 +5,7 @@ import XiamiProvider from './providers/Xiami'
 import BaseMusicProvider from './providers/Base'
 import * as _ from 'lodash'
 import * as express from 'express'
+import * as morgan from 'morgan'
 import * as http from 'http'
 import * as bodyParser from 'body-parser'
 import * as rp from 'request-promise'
@@ -12,6 +13,7 @@ import {autobind} from 'core-decorators'
 const app = express()
 
 app.use(bodyParser.json())
+app.use(morgan('combined'))
 http.createServer(app).listen(process.env.port || 3120)
 
 const providers = new Map<string, BaseMusicProvider>()
