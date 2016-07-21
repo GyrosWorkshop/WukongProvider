@@ -4,8 +4,8 @@ const dbConfig = require('../server-config.json').database
 
 let sequelize: Sequelize.Connection
 if (dbConfig) {
-    // Use mysql
-    sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig)
+    // Use postgresql connection uri
+    sequelize = new Sequelize(dbConfig)
 } else {
     // Use sqlite
     sequelize = new Sequelize('database', 'username', 'password', {

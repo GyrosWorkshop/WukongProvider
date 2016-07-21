@@ -8,12 +8,5 @@
       "ClientSecret": ""
     },
     "trust_proxy": "127.0.0.1",
-    "database (rename this)": {
-        "database": "wukong_provider",
-        "host": "127.0.0.1",
-        "dialect": "mysql",
-        "dialectOptions": { "charset": "utf8mb4" },
-        "username": "wukong_provider",
-        "password": "PASSWORD"
-    }
+    "database (rename this)": "postgres://wukong:password@127.0.0.1/wukong"
 }
