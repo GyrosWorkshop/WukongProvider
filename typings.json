@@ -11,7 +11,7 @@
     "html-entities": "registry:dt/html-entities#1.2.0+20160412134357",
     "jquery": "registry:dt/jquery#1.10.0+20160704162008",
     "jsdom": "registry:dt/jsdom#2.0.0+20160316155526",
-    "lodash": "registry:dt/lodash#3.10.0+20160619033623",
+    "lodash": "registry:global/lodash#4.0.0+20160701205107",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "mocha": "registry:dt/mocha#2.2.5+20160619032855",
     "morgan": "registry:dt/morgan#1.7.0+20160524142355",
