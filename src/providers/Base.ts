@@ -59,7 +59,12 @@ abstract class BaseMusicProvider {
     }
 
     protected async bulkSave(songs: Wukong.ISong[]): Promise<void> {
-        await Song.bulkCreate(songs)
+        try {
+            await Song.bulkCreate(songs)
+        } catch (e) {
+            // tolerate
+            console.error('bulkSave err', e)
+        }
     }
 
     protected async load(songId: string): Promise<Wukong.ISong & {meta: string}> {
