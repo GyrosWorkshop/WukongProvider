@@ -6,5 +6,6 @@
     "Groove": {
       "ClientId": "",
       "ClientSecret": ""
-    }
+    },
+    "trust_proxy": "127.0.0.1"
 }

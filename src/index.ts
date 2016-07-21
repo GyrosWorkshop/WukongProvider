@@ -10,9 +10,12 @@ import * as http from 'http'
 import * as bodyParser from 'body-parser'
 import * as rp from 'request-promise'
 import {autobind} from 'core-decorators'
+const serverConfig = require('../server-config.json')
 const app = express()
 
 app.use(bodyParser.json())
+if (serverConfig.trust_proxy)
+    app.set('trust proxy', serverConfig.trust_proxy)
 app.use(morgan('combined'))
 http.createServer(app).listen(process.env.port || 3120)
 
