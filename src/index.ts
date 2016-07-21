@@ -122,4 +122,6 @@ class Controller {
 
 new Controller(app)
 
+console.log('wukong provider started.')
+
 module.exports = app
