@@ -22,7 +22,7 @@ export default sequelize
 export const Lyric = sequelize.define('lyric', {
     withTimeline: Sequelize.BOOLEAN,
     translate: Sequelize.BOOLEAN,
-    lyric: Sequelize.STRING
+    lyric: Sequelize.TEXT
 }, {
     indexes: [
         {
