@@ -60,7 +60,7 @@ abstract class BaseMusicProvider {
 
     protected async bulkSave(songs: Wukong.ISong[]): Promise<void> {
         try {
-            await Song.bulkCreate(_.uniqBy(songs, ['siteId', 'songId']))
+            await Promise.all(songs.map(song => Song.upsert(song)))
         } catch (e) {
             // tolerate
             console.error('bulkSave err', e)
