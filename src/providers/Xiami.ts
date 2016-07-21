@@ -5,11 +5,33 @@ import * as _ from 'lodash'
 @autobind
 export default class XiamiMusicProvider extends BaseProvider {
     get providerName() {
-        return 'Xiami' 
+        return 'Xiami'
     }
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
-        return await this.load(songId)
+        let song = await this.load(songId)
+        if (!song) {
+            // HACK: 找不到歌曲，就再搜索一遍
+            const songs = await this.searchSongs(await this.getKeyword(songId))
+            songs.forEach(it => {
+                if (it.songId === songId) song = <any>it
+            })
+            console.log(songs, song)
+        }
+        return song
+    }
+
+    private async getKeyword(songId: string): Promise<string> {
+        const res: string = await this.sendRequest({
+            url: `http://www.xiami.com/song/${songId}`
+        })
+        const match = /<title>(.+)<\/title>/.exec(res)
+        if (match) {
+            console.log(`keyword ${songId}: ${match[1]}`)
+            return match[1]
+        } else {
+            throw new Error('cannot get keyword')
+        }
     }
 
     async searchSongs(keywords: string, offset: number = 0, limit: number = 30): Promise<Array<Wukong.ISong>> {
