@@ -47,7 +47,8 @@ export default class XiamiMusicProvider extends BaseProvider {
                 artist: it.author,
                 artwork: it.cover,
                 bitrate: 128000,
-                file: it.src
+                file: it.src,
+                length: 0.0
             } as Wukong.ISong
         })
     }
