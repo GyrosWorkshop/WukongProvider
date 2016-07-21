@@ -1,13 +1,22 @@
 import * as Sequelize from 'sequelize'
 import {join} from 'path'
+const dbConfig = require('../server-config.json').database
 
-const sequelize = new Sequelize('database', 'username', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    storage: join(__dirname, '..', 'storage/sqlite.db'),
-    logging: false,
-    native: true
-})
+let sequelize: Sequelize.Connection
+if (dbConfig) {
+    // Use mysql
+    sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig)
+} else {
+    // Use sqlite
+    sequelize = new Sequelize('database', 'username', 'password', {
+        host: 'localhost',
+        dialect: 'sqlite',
+        storage: join(__dirname, '..', 'storage/sqlite.db'),
+        logging: false,
+        native: true
+    })
+}
+
 export default sequelize
 
 export const Lyric = sequelize.define('lyric', {
