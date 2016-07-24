@@ -250,7 +250,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             })
             let songList = this.convertToSongApiV2(resObject.result.songs, false)
             this.songSearchCache.set(key, songList)
-            await this.bulkSave(songList)
             return songList
         } catch (err) {
             console.error(`search error`, err)
@@ -261,7 +260,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
 
     public async getSongInfo(songId: string): Promise<Wukong.ISong> {
         const key = `song-${songId}`
-        let song: Wukong.ISong = await this.load(songId)
+        let song: Wukong.ISong = await this.load(songId, true)
         if (!song) {
             let body = NeteaseCloudMusicProvider.encryptRequest({
                 id: songId,
@@ -281,6 +280,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             } catch (err) {
                 console.error(err)
             }
+            Object.assign(song, { detail: true })
             await this.save(song)
             if (!song) return null
         }

@@ -9,7 +9,7 @@ import * as jsdom from 'jsdom'
 @autobind
 export default class QQMusicProvider extends BaseProvider {
     get providerName() {
-        return 'QQMusic' 
+        return 'QQMusic'
     }
 
     constructor() {
@@ -53,9 +53,10 @@ export default class QQMusicProvider extends BaseProvider {
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
         // Fixme: get music from baseinfo API.
-        let song: Wukong.ISong = await this.load(songId)
+        let song: Wukong.ISong = await this.load(songId, true)
         if (!song) {
             song = await this.getSingleSongOnline(songId)
+            Object.assign(song, { detail: true })
             await this.save(song)
         }
         return song
@@ -83,7 +84,6 @@ export default class QQMusicProvider extends BaseProvider {
             }
         })
         const songs = this.mapToISong(JSON.parse(result).data.song.list).filter(it => !_.isUndefined(it))
-        await this.bulkSave(songs)
         return songs
     }
 

@@ -67,7 +67,7 @@ abstract class BaseMusicProvider {
         }
     }
 
-    protected async load(songId: string): Promise<Wukong.ISong & {meta: string}> {
+    protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong & {meta: string}> {
         const data = await Song.findOne({
             where: {
                 songId: songId,
@@ -79,9 +79,12 @@ abstract class BaseMusicProvider {
                     as: 'lyrics'
                 }
             ]
-        }) as any
-        if (data) return data.dataValues;
-        else return null;
+        }) as any;
+        if (data && ((needDetail && data.dataValues.detail) || !needDetail)) {
+            return data.dataValues;
+        } else {
+            return null;
+        }
     }
 
     abstract async searchSongs(searchKey: string, offset: number, limit: number): Promise<Array<Wukong.ISong>>
