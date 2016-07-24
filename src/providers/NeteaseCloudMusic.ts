@@ -211,7 +211,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             if (resObject.lrc && resObject.lrc.lyric) {
                 const lyrics: Wukong.ILyric[] = []
                 let withTimeline: boolean = true
-                if (resObject.qfy === true && !/\[\d+:\d+\.\d+\]/.exec(resObject.lrc.lyric)) {
+                if (resObject.qfy === true && !this.checkLyricWithTimeline(resObject.lrc.lyric)) {
                     withTimeline = false
                 }
                 lyrics.push(this.convertLyric(resObject.lrc, false, withTimeline))

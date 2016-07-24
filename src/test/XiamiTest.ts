@@ -15,13 +15,18 @@ describe('XiamiMusicProvider', () => {
             assert.equal(song.artist, '田馥甄')
             assert.equal(song.songId, '1770409076')
             assert.equal(song.title, '魔鬼中的天使')
+            assert.equal(song.album, 'My Love')
             assert.isString(song.artwork)
+            assert.isTrue(song.artwork.startsWith('http'))
+            assert.isArray(song.lyrics)
+            assert.isTrue(song.lyrics[0].lyric.indexOf('魔鬼中的天使') !== -1)
         })
     })
     describe('playing url', () => {
         it('playing url', async () => {
             const url = await provider.getPlayingUrl('1770409076', false)
             assert.isString(url)
+            assert.isTrue(url.startsWith('http'))
         })
     })
 })

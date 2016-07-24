@@ -29,7 +29,7 @@ abstract class BaseMusicProvider {
     /**
      * Currently only new one created. (update not available)
      */
-    protected async save(song: Wukong.ISong): Promise<void> {
+    protected async save(song: Wukong.ISong & {meta?: string, detail?: boolean}): Promise<void> {
         let dbSong = await Song.findOne({
             where: {
                 songId: song.songId,
@@ -58,7 +58,7 @@ abstract class BaseMusicProvider {
         }
     }
 
-    protected async bulkSave(songs: Wukong.ISong[]): Promise<void> {
+    protected async bulkSave(songs: (Wukong.ISong & {meta?: string, detail?: boolean})[]): Promise<void> {
         try {
             await Promise.all(songs.map(song => Song.upsert(song)))
         } catch (e) {
@@ -67,7 +67,7 @@ abstract class BaseMusicProvider {
         }
     }
 
-    protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong & {meta: string}> {
+    protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
         const data = await Song.findOne({
             where: {
                 songId: songId,
@@ -85,6 +85,10 @@ abstract class BaseMusicProvider {
         } else {
             return null;
         }
+    }
+
+    protected checkLyricWithTimeline(lyric: string) {
+        return !!/\[\d+:\d+\.\d+\]/.exec(lyric)
     }
 
     abstract async searchSongs(searchKey: string, offset: number, limit: number): Promise<Array<Wukong.ISong>>
