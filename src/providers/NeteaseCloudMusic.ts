@@ -336,6 +336,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
 
     private mapToSongList(rawData: any, withSongs: boolean = false): Wukong.ISongList {
         return {
+            siteId: this.providerName,
             songListId: rawData.id.toString(),
             creator: this.mapToThirdPartyUser(rawData.creator),
             name: rawData.name,

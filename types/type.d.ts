@@ -49,6 +49,7 @@ declare namespace Wukong {
     }
 
     export interface ISongList {
+        siteId: string
         songListId: string
         creator: IThirdPartyUser
         name: string
