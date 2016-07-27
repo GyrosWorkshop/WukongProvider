@@ -241,7 +241,11 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             userId: rawData.userId.toString(),
             name: rawData.nickname,
             signature: rawData.signature,
-            avatar: rawData.avatarUrl
+            gender: rawData.gender,
+            avatar: rawData.avatarUrl,
+            songListCount: rawData.playlistcount,
+            followers: rawData.followeds,
+            follows: rawData.follows
         }
     }
 

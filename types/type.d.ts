@@ -41,7 +41,11 @@ declare namespace Wukong {
         userId: string
         name: string
         signature?: string
-        avatar: string
+        gender?: number         // 0: 未知, 1: 男, 2: 女
+        avatar?: string
+        songListCount?: number
+        followers?: number      // ta 关注了多少人
+        follows?: number        // ta 被多少人关注
     }
 
     export interface ISongList {
