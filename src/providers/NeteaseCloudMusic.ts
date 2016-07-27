@@ -134,7 +134,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 }
             }
             if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
-                musicUrl = musicUrl.replace(/http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
+                musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
             }
             let songLength = o.duration
             return {
@@ -171,7 +171,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 }
             }
             if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
-                musicUrl = musicUrl.replace(/http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
+                musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
             }
             let songLength = o.dt
             if (musicAvail) {
