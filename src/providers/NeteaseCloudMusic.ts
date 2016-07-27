@@ -237,7 +237,9 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
 
     private mapToThirdPartyUser(rawData: any): Wukong.IThirdPartyUser {
         return {
-            userId: rawData.userId,
+            siteId: this.providerName,
+            userId: rawData.userId.toString(),
+            name: rawData.nickname,
             signature: rawData.signature,
             avatar: rawData.avatarUrl
         }
@@ -330,14 +332,15 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
 
     private mapToSongList(rawData: any, withSongs: boolean = false): Wukong.ISongList {
         return {
-            songListId: rawData.id,
+            songListId: rawData.id.toString(),
             creator: this.mapToThirdPartyUser(rawData.creator),
             name: rawData.name,
             playCount: rawData.playCount,
             description: rawData.description,
             createTime: moment(rawData.createTime).format('YYYY-MM-DD HH:mm:ss'),
             cover: this.getImageUrl(rawData.coverImgId),
-            songs: withSongs ? this.convertToSongApiV2(rawData.tracks) : null
+            songs: withSongs ? this.convertToSongApiV2(rawData.tracks) : null,
+            songCount: rawData.trackCount
         }
     }
 
@@ -385,6 +388,28 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
+    public async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]> {
+        const body = NeteaseCloudMusicProvider.encryptRequest({
+            s: searchKey.toString(),
+            type: '1002',
+            offset: '0',
+            total: 'true',
+            limit: '30',
+            csrf_token: ''
+        })
+        const resObject = await this.sendRequest({
+            uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/cloudsearch/get/web`,
+            qs: {
+                csrf_token: ''
+            },
+            form: body
+        })
+        if (resObject.code === 200) {
+            return resObject.result.userprofiles.map((it: any) => this.mapToThirdPartyUser(it))
+        } else {
+            throw new Error('NeteaseCloudMusicProvider searchUsers: ret code not 200')
+        }
+    }
 }
 
 export default NeteaseCloudMusicProvider

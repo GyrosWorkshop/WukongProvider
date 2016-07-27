@@ -37,7 +37,9 @@ declare namespace Wukong {
     }
 
     export interface IThirdPartyUser {
+        siteId: string
         userId: string
+        name: string
         signature?: string
         avatar: string
     }

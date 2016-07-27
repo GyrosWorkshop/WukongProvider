@@ -36,6 +36,7 @@ class Controller {
         app.post('/api/songInfo', this.wrap(this.songInfo))
         app.post('/api/songList', this.wrap(this.songList))
         app.post('/api/userSongLists', this.wrap(this.userSongLists))
+        app.post('/api/searchUsers', this.wrap(this.searchUsers))
     }
     /**
      * @api {POST} /api/searchSongs search songs
@@ -150,6 +151,28 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         return provider.getUserSongLists(thirdPartyUserId)
+    }
+
+    /**
+     * @api {POST} /api/searchUsers searchUsers
+     * @apiName searchUsers
+     * @apiGroup API
+     * @apiParam {string} key
+     * @apiSuccessExample Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *      }
+     */
+    async searchUsers(req: express.Request) {
+        const {key} = req.body as {
+            key: string
+        }
+        if (!_.isString(key) || _.isEmpty(key)) {
+            throw new Error('IllegalArgumentException key not exist or wrong type.')
+        }
+        const result = await Promise.all<Wukong.IThirdPartyUser[]>([...providers].map(([, it]) => it.searchUsers(key)))
+        const data = Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it)
+        return data
     }
 
     private wrap(fn: Function) {
