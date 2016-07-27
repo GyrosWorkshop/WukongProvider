@@ -3,8 +3,11 @@ import * as _ from 'lodash'
 import * as Request from 'request'
 import * as CryptoJS from 'crypto-js'
 import BaseMusicProvider from './Base'
+const moment = require('moment-timezone')
 const serverConfig = require('../../server-config.json')
 const bigint = require('BigInt')
+
+moment.tz.setDefault('Asia/Shanghai')
 
 class NeteaseCloudMusicProvider extends BaseMusicProvider {
     get providerName() {
@@ -109,12 +112,16 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         this.RequestOptions.method = 'POST'
     }
 
-    private convertToSongApiV1(rawArray: Array<any>, isDetailed: boolean): Array<Wukong.ISong> {
+    private getImageUrl(fId: string) {
+        return `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(fId)}/${fId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
+    }
+
+    private convertToSongApiV1(rawArray: Array<any>, isDetailed: boolean = false): Array<Wukong.ISong> {
         return rawArray.map((o: any) => {
             let albumUrl = o.album && o.album.picUrl,
                 albumPicId = o.album && o.album.picId
             if (albumPicId) {
-                albumUrl = `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(albumPicId)}/${albumPicId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
+                albumUrl = this.getImageUrl(albumPicId)
             }
             let musicUrl = o.mp3Url
             let musicUrlDomain = musicUrl ? /http:\/\/(.+?)\//.exec(musicUrl)[0] : 'http://m2.music.126.net/'
@@ -144,12 +151,13 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         })
     }
 
-    private convertToSongApiV2(rawArray: Array<any>, isDetailed: boolean): Array<Wukong.ISong> {
+    private convertToSongApiV2(rawArray: Array<any>, isDetailed: boolean = false): Array<Wukong.ISong> {
+        console.log(rawArray)
         return rawArray.map((o: any) => {
             let albumUrl = o.al && o.al.picUrl,
                 albumPicId = o.al && o.al.pic_str
             if (albumPicId) {
-                albumUrl = `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(albumPicId)}/${albumPicId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
+                albumUrl = this.getImageUrl(albumPicId)
             }
             let musicUrl: string
             let musicUrlDomain = musicUrl ? /http:\/\/(.+?)\//.exec(musicUrl)[0] : 'http://m2.music.126.net/'
@@ -224,6 +232,14 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             }
         } else {
             return undefined
+        }
+    }
+
+    private mapToThirdPartyUser(rawData: any): Wukong.IThirdPartyUser {
+        return {
+            userId: rawData.userId,
+            signature: rawData.signature,
+            avatar: rawData.avatarUrl
         }
     }
 
@@ -303,13 +319,45 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         })
         song.file = resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString()
         if (NeteaseCloudMusicProvider.binCdn && song.file) {
-            song.file = song.file.replace(/http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
+            song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
         }
         return song.file
     }
 
     protected async sendRequest(options: Request.Options): Promise<any> {
         return JSON.parse(await super.sendRequest(options))
+    }
+
+    public async getSongList(songListId: string): Promise<Wukong.ISongList> {
+        const body = NeteaseCloudMusicProvider.encryptRequest({
+            id: songListId.toString(),
+            offset: '0',
+            total: 'true',
+            limit: '1000',
+            n: '1000',
+            csrf_token: ''
+        })
+        const resObject = await this.sendRequest({
+            uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/v3/playlist/detail`,
+            qs: {
+                csrf_token: ''
+            },
+            form: body
+        })
+        if (resObject.code === 200) {
+            return {
+                songListId: resObject.playlist.id,
+                creator: this.mapToThirdPartyUser(resObject.playlist.creator),
+                name: resObject.playlist.name,
+                playCount: resObject.playlist.playCount,
+                description: resObject.playlist.description,
+                createTime: moment(resObject.playlist.createTime).format('YYYY-MM-DD HH:mm:ss'),
+                cover: this.getImageUrl(resObject.playlist.coverImgId),
+                songs: this.convertToSongApiV2(resObject.playlist.tracks)
+            }
+        } else {
+            throw new Error('NeteaseCloudMusicProvider getSongList: ret code not 200')
+        }
     }
 
 }

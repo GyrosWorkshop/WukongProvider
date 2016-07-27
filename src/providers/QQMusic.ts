@@ -168,4 +168,7 @@ export default class QQMusicProvider extends BaseProvider {
         const key: string = JSON.parse(result.replace(/^jsonCallback\((.*)\);$/, '$1')).key
         return `http://cc.stream.qqmusic.qq.com/C200${songId}.m4a?vkey=${key}&fromtag=30&guid=${guid}`
     }
+
+    // TODO
+    public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
 }

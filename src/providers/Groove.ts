@@ -90,5 +90,8 @@ export default class GrooveProvider extends BaseProvider {
         return song
     }
 
+    // TODO
+    public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
+
 }
 

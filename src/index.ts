@@ -34,6 +34,7 @@ class Controller {
     constructor(app: express.Application) {
         app.post('/api/searchSongs', this.wrap(this.searchSongs))
         app.post('/api/songInfo', this.wrap(this.songInfo))
+        app.post('/api/songList', this.wrap(this.songList))
     }
     /**
      * @api {POST} /api/searchSongs search songs
@@ -96,6 +97,32 @@ class Controller {
             song.file = await provider.getPlayingUrl(songId, overseas)
         }
         return song
+    }
+
+    /**
+     * @api {POST} /api/songList songList
+     * @apiName songList
+     * @apiGroup API
+     * @apiParam {string} siteId
+     * @apiParam {string} songListId
+     * @apiSuccessExample Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *      }
+     */
+    async songList(req: express.Request) {
+        const {siteId, songListId} = req.body as {
+            siteId: string,
+            songListId: string
+        }
+        if (!siteId || !songListId) {
+            throw new Error('IllegalArgumentException siteId or songListId is empty')
+        }
+        const provider = providers.get(siteId)
+        if (!provider) {
+            throw new Error('site provider not exist.')
+        }
+        return provider.getSongList(songListId)
     }
 
     private wrap(fn: Function) {

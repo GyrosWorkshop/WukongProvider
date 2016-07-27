@@ -10,7 +10,7 @@ declare namespace Wukong {
         title: string
         artist: string
         album: string
-        
+
         file?: string
         artwork?: string
         length?: number
@@ -28,11 +28,28 @@ declare namespace Wukong {
         listenOnlyMode: boolean
         finished: boolean
     }
-    
+
 
     interface ILyric {
         withTimeline: boolean
         translate: boolean
         lyric: string
+    }
+
+    export interface IThirdPartyUser {
+        userId: string
+        signature?: string
+        avatar: string
+    }
+
+    export interface ISongList {
+        songListId: string
+        creator: IThirdPartyUser
+        name: string
+        playCount?: number
+        description?: string
+        createTime?: string
+        cover?: string
+        songs: ISong[]
     }
 }

@@ -114,4 +114,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         const cookies = jar.getCookieString('http://xiami.com').split('=')[1]
         return cookies
     }
+
+    // TODO
+    public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
 }
