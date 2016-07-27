@@ -152,7 +152,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     private convertToSongApiV2(rawArray: Array<any>, isDetailed: boolean = false): Array<Wukong.ISong> {
-        console.log(rawArray)
         return rawArray.map((o: any) => {
             let albumUrl = o.al && o.al.picUrl,
                 albumPicId = o.al && o.al.pic_str
