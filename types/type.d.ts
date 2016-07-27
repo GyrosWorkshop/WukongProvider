@@ -50,6 +50,7 @@ declare namespace Wukong {
         description?: string
         createTime?: string
         cover?: string
-        songs: ISong[]
+        songs?: ISong[]
+        songCount?: number
     }
 }

@@ -35,6 +35,7 @@ class Controller {
         app.post('/api/searchSongs', this.wrap(this.searchSongs))
         app.post('/api/songInfo', this.wrap(this.songInfo))
         app.post('/api/songList', this.wrap(this.songList))
+        app.post('/api/userSongLists', this.wrap(this.userSongLists))
     }
     /**
      * @api {POST} /api/searchSongs search songs
@@ -123,6 +124,32 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         return provider.getSongList(songListId)
+    }
+
+    /**
+     * @api {POST} /api/userSongLists userSongLists
+     * @apiName userSongLists
+     * @apiGroup API
+     * @apiParam {string} siteId
+     * @apiParam {string} thirdPartyUserId
+     * @apiSuccessExample Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *      }
+     */
+    async userSongLists(req: express.Request) {
+        const {siteId, thirdPartyUserId} = req.body as {
+            siteId: string,
+            thirdPartyUserId: string
+        }
+        if (!siteId || !thirdPartyUserId) {
+            throw new Error('IllegalArgumentException siteId or thirdPartyUserId is empty')
+        }
+        const provider = providers.get(siteId)
+        if (!provider) {
+            throw new Error('site provider not exist.')
+        }
+        return provider.getUserSongLists(thirdPartyUserId)
     }
 
     private wrap(fn: Function) {

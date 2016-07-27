@@ -328,6 +328,19 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return JSON.parse(await super.sendRequest(options))
     }
 
+    private mapToSongList(rawData: any, withSongs: boolean = false): Wukong.ISongList {
+        return {
+            songListId: rawData.id,
+            creator: this.mapToThirdPartyUser(rawData.creator),
+            name: rawData.name,
+            playCount: rawData.playCount,
+            description: rawData.description,
+            createTime: moment(rawData.createTime).format('YYYY-MM-DD HH:mm:ss'),
+            cover: this.getImageUrl(rawData.coverImgId),
+            songs: withSongs ? this.convertToSongApiV2(rawData.tracks) : null
+        }
+    }
+
     public async getSongList(songListId: string): Promise<Wukong.ISongList> {
         const body = NeteaseCloudMusicProvider.encryptRequest({
             id: songListId.toString(),
@@ -345,18 +358,30 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             form: body
         })
         if (resObject.code === 200) {
-            return {
-                songListId: resObject.playlist.id,
-                creator: this.mapToThirdPartyUser(resObject.playlist.creator),
-                name: resObject.playlist.name,
-                playCount: resObject.playlist.playCount,
-                description: resObject.playlist.description,
-                createTime: moment(resObject.playlist.createTime).format('YYYY-MM-DD HH:mm:ss'),
-                cover: this.getImageUrl(resObject.playlist.coverImgId),
-                songs: this.convertToSongApiV2(resObject.playlist.tracks)
-            }
+            return this.mapToSongList(resObject.playlist, true)
         } else {
             throw new Error('NeteaseCloudMusicProvider getSongList: ret code not 200')
+        }
+    }
+
+    public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> {
+        const body = NeteaseCloudMusicProvider.encryptRequest({
+            uid: thirdPartyUserId.toString(),
+            offset: '0',
+            limit: '1001',
+            csrf_token: ''
+        })
+        const resObject = await this.sendRequest({
+            uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/user/playlist`,
+            qs: {
+                csrf_token: ''
+            },
+            form: body
+        })
+        if (resObject.code === 200) {
+            return resObject.playlist.map((it: any) => this.mapToSongList(it, false))
+        } else {
+            throw new Error('NeteaseCloudMusicProvider getUserSongLists: ret code not 200')
         }
     }
 

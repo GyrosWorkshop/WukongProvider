@@ -96,6 +96,7 @@ abstract class BaseMusicProvider {
     abstract async getSongInfo(songId: string): Promise<Wukong.ISong>
     abstract async getPlayingUrl(songId: string, ovserseas: boolean): Promise<string>
     abstract async getSongList(songListId: string): Promise<Wukong.ISongList>
+    abstract async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]>
 }
 
 export default BaseMusicProvider

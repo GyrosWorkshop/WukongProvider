@@ -117,4 +117,7 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     // TODO
     public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
+
+    // TODO
+    public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> { return null }
 }
