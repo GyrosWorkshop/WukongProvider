@@ -101,7 +101,7 @@ export default class QQMusicProvider extends BaseProvider {
         song.siteId = this.providerName
         song.songId = songId
         song.file = ''
-        song.artwork = this.getArtworkUrl(baseInfo.albummid)
+        song.artwork = this.getArtworkUrl(baseInfo.albummid || baseInfo.album.mid)
         song.bitrate = 320 * 1000
         song.lyrics = await this.getSongLyrics(songId)
         return song
