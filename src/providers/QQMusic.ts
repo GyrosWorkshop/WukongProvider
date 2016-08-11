@@ -110,15 +110,24 @@ export default class QQMusicProvider extends BaseProvider {
 
     private getMaxAvailBitrate(baseInfoFile: any): any {
         const bitrateKeyOrder = [
-            [ 320000, 'size_320mp3' ],
-            [ 192000, 'size_192ogg' ],
-            [ 192000, 'size_192aac' ],
-            [ 128000, 'size_128mp3' ],
-            [  96000, 'size_96aac'  ],
-            [  48000, 'size_48aac'  ]
+            [ 320000, 'size_320mp3', 'mp3', 'M800' ],
+            //[ 192000, 'size_192ogg', 'ogg' ],
+            //[ 192000, 'size_192aac', 'aac' ],
+            [ 128000, 'size_128mp3', 'mp3', 'M500' ],
+            //[  96000, 'size_96aac',  'aac' ],
+            //[  48000, 'size_48aac',  'aac' ],
+            [ 128000, 'size_128',    'm4a', 'C200' ]
         ];
         for (let it of bitrateKeyOrder) {
-            if (baseInfoFile[it[1]]) return { bitrate: it[0], key: it[1], fileId: it[2] }
+            if (baseInfoFile[it[1]]) {
+                return {
+                    bitrate: it[0],
+                    key: it[1],
+                    meta: baseInfoFile[it[1]],
+                    extension: it[2],
+                    prefix: it[3]
+                }
+            }
         }
     }
 
@@ -180,8 +189,11 @@ export default class QQMusicProvider extends BaseProvider {
                 guid: guid
             }
         })
+        console.log(result)
+        const baseInfo: any = await this.getBaseInfo(songId)
+        const bitrateInfo = this.getMaxAvailBitrate(baseInfo.file)
         const key: string = JSON.parse(result.replace(/^jsonCallback\((.*)\);$/, '$1')).key
-        return `http://cc.stream.qqmusic.qq.com/C200${songId}.m4a?vkey=${key}&fromtag=30&guid=${guid}`
+        return `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
     }
 
     // TODO
