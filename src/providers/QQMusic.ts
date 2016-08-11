@@ -122,7 +122,7 @@ export default class QQMusicProvider extends BaseProvider {
                 return {
                     bitrate: it[0],
                     key: it[1],
-                    meta: baseInfoFile[it[1]],
+                    size: baseInfoFile[it[1]],
                     extension: it[2],
                     prefix: it[3]
                 }
