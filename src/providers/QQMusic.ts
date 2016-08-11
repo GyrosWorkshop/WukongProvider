@@ -94,17 +94,32 @@ export default class QQMusicProvider extends BaseProvider {
     async getSingleSongOnline(songId: string): Promise<Wukong.ISong> {
         const song = {} as Wukong.ISong
         const baseInfo = await this.getBaseInfo(songId)
-        song.album = baseInfo.albumname
+        console.log(baseInfo)
+        song.album = baseInfo.album.name
         song.artist = baseInfo.singer.map((it: any) => it.name).join(', ')
-        song.title = baseInfo.songname
+        song.title = baseInfo.title
         song.length = Math.floor(parseFloat(baseInfo.interval) * 1000)
         song.siteId = this.providerName
         song.songId = songId
         song.file = ''
-        song.artwork = this.getArtworkUrl(baseInfo.albummid || baseInfo.album.mid)
-        song.bitrate = 320 * 1000
+        song.artwork = this.getArtworkUrl(baseInfo.album.mid)
+        song.bitrate = this.getMaxAvailBitrate(baseInfo.file).bitrate
         song.lyrics = await this.getSongLyrics(songId)
         return song
+    }
+
+    private getMaxAvailBitrate(baseInfoFile: any): any {
+        const bitrateKeyOrder = [
+            [ 320000, 'size_320mp3' ],
+            [ 192000, 'size_192ogg' ],
+            [ 192000, 'size_192aac' ],
+            [ 128000, 'size_128mp3' ],
+            [  96000, 'size_96aac'  ],
+            [  48000, 'size_48aac'  ]
+        ];
+        for (let it of bitrateKeyOrder) {
+            if (baseInfoFile[it[1]]) return { bitrate: it[0], key: it[1], fileId: it[2] }
+        }
     }
 
     private mapToSongSingle(data: any): Wukong.ISong {
