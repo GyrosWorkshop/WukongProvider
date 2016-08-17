@@ -91,6 +91,7 @@ export default class XiamiMusicProvider extends BaseProvider {
                 _xiamitoken: token
             }
         })
+        if (!res) return []
         return res.map((it: any) => {
             return {
                 songId: it.id,
