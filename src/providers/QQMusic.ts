@@ -5,7 +5,7 @@ import BaseProvider from './Base'
 import {autobind} from 'core-decorators'
 import * as _ from 'lodash'
 import * as jsdom from 'jsdom'
-import {AllHtmlEntities} from 'html-entities';
+import {AllHtmlEntities} from 'html-entities'
 
 @autobind
 export default class QQMusicProvider extends BaseProvider {

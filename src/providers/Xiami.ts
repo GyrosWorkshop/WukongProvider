@@ -1,11 +1,19 @@
 import BaseProvider, {Request} from './Base'
 import {autobind} from 'core-decorators'
 import * as _ from 'lodash'
+import {AllHtmlEntities} from 'html-entities'
 
 @autobind
 export default class XiamiMusicProvider extends BaseProvider {
     get providerName() {
         return 'Xiami'
+    }
+
+    private entities: AllHtmlEntities
+
+    constructor() {
+        super()
+        this.entities = new AllHtmlEntities()
     }
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
@@ -23,16 +31,16 @@ export default class XiamiMusicProvider extends BaseProvider {
         if (!res.status) return null
         const onlineSong: any = res.data.trackList[0]
         const song = {} as Wukong.ISong
-        song.album = onlineSong.album_name
-        song.artist = onlineSong.artist
-        song.artwork = onlineSong.album_pic
-        song.bitrate = 128000
-        song.file = ''
-        song.length = onlineSong.length * 1000
-        song.lyrics = await this.getSongLyrics(onlineSong.lyric_url)
         song.siteId = this.providerName
         song.songId = songId
         song.title = onlineSong.songName
+        song.album = onlineSong.album_name
+        song.artist = onlineSong.artist || this.entities.decode(onlineSong.artist_name)
+        song.artwork = onlineSong.album_pic
+        song.bitrate = 128000
+        song.length = onlineSong.length * 1000
+        song.file = ''
+        song.lyrics = await this.getSongLyrics(onlineSong.lyric_url)
         return Object.assign(song, {meta: JSON.stringify(onlineSong), detail: true})
     }
 
