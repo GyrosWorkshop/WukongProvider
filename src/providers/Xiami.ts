@@ -83,24 +83,34 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     private async searchSongsOnlne(token: string, key: string): Promise<Array<Wukong.ISong>> {
-        const res: any[] = await this.sendRequest({
-            url: 'http://www.xiami.com/web/search-songs',
+        const res: any = await this.sendRequest({
+            url: 'http://api.xiami.com/web?v=2.0&app_key=1&key=it%27s%20so%20easy&page=1&limit=50&_ksTS=1459930568781_153&callback=jsonp154&r=search/songs',
             json: true,
             qs: {
-                key: key,
+                key,
+                v: '2.0',
+                app_key: 1,
+                page: 1,
+                limit: 50,
+                _ksTS: Date.now(),
+                callback: '',
+                r: 'search/songs',
                 _xiamitoken: token
+            },
+            headers: {
+                'Referer': 'http://m.xiami.com/'
             }
         })
-        if (!res) return []
-        console.log(res)
-        return res.map((it: any) => {
+        if (!res || res.state) return []
+        console.log(res.data.songs)
+        return res.data.songs.map((it: any) => {
             return {
-                songId: it.id,
+                songId: it.song_id,
                 siteId: this.providerName,
-                title: it.title,
-                album: ' ',
-                artist: it.author,
-                artwork: it.cover,
+                title: it.song_name,
+                album: it.album_name,
+                artist: it.artist_name,
+                artwork: it.album_logo.replace('1.jpg', '4.jpg'),   // get larger size
                 bitrate: 128000,
                 length: 0.0
             } as Wukong.ISong
