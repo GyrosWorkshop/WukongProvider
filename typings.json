@@ -14,6 +14,7 @@
     "lodash": "registry:global/lodash#4.0.0+20160701205107",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "mocha": "registry:dt/mocha#2.2.5+20160619032855",
+    "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",
     "moment-timezone": "registry:dt/moment-timezone#0.2.5+20160329220348",
     "morgan": "registry:dt/morgan#1.7.0+20160524142355",
     "node": "registry:env/node#6.0.0+20160622202520",
