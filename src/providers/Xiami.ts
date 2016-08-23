@@ -92,6 +92,7 @@ export default class XiamiMusicProvider extends BaseProvider {
             }
         })
         if (!res) return []
+        console.log(res)
         return res.map((it: any) => {
             return {
                 songId: it.id,

@@ -5,6 +5,7 @@ import BaseProvider from './Base'
 import {autobind} from 'core-decorators'
 import * as _ from 'lodash'
 import * as jsdom from 'jsdom'
+import {AllHtmlEntities} from 'html-entities';
 
 @autobind
 export default class QQMusicProvider extends BaseProvider {
@@ -12,9 +13,12 @@ export default class QQMusicProvider extends BaseProvider {
         return 'QQMusic'
     }
 
+    private entities: AllHtmlEntities
+
     constructor() {
         super()
         this.RequestOptions.headers['Referer'] = 'http://y.qq.com/'
+        this.entities = new AllHtmlEntities()
     }
 
     private async getSongLyrics(songId: string): Promise<Wukong.ILyric[]> {
@@ -140,9 +144,9 @@ export default class QQMusicProvider extends BaseProvider {
         const song = {} as Wukong.ISong
         const imgId = f[22]
 
-        song.album = f[5]
-        song.artist = data.fsinger
-        song.title = f[1]
+        song.album = this.entities.decode(f[5])
+        song.artist = this.entities.decode(data.fsinger)
+        song.title = this.entities.decode(f[1])
         song.length = Math.floor(parseFloat(f[7]) * 1000)
         song.siteId = this.providerName
         song.songId = f[20]
