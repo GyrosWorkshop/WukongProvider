@@ -62,7 +62,10 @@ class Controller {
             throw new Error('IllegalArgumentException "key" not exist or wrong type.')
         }
         const result = await Promise.all<Wukong.ISong[]>([...providers].map(([, it]) => it.searchSongs(key)))
-        const data = Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it)
+        const data = _.uniqBy(
+            Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it),
+            (it: Wukong.ISong) => `${it.siteId}|${it.songId}`
+        )
         return data
     }
 
