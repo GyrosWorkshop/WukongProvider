@@ -112,6 +112,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         this.RequestOptions.method = 'POST'
     }
 
+    private getTraditionalMusicUrl(fId: string) {
+        return `http://m2.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(fId)}/${fId}.mp3`
+    }
+
     private getImageUrl(fId: string) {
         return `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(fId)}/${fId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
     }
