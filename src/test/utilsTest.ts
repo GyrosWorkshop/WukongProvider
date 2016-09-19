@@ -34,4 +34,11 @@ describe('guessFromSongListUrl', () => {
             songListId: '28613019'
         })
     })
+    it('end /', () => {
+        const link = 'http://music.163.com/#/playlist/?id=28613019'
+        assert.deepEqual(guessFromSongListUrl(link), {
+            siteId: 'netease-cloud-music',
+            songListId: '28613019'
+        })
+    })
 })

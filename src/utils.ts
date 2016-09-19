@@ -1,5 +1,6 @@
 import * as Url from 'url'
 import * as qs from 'querystring'
+import * as _ from 'lodash'
 
 export function guessFromSongListUrl(link: string): SiteSongList {
     try {
@@ -15,14 +16,15 @@ export function guessFromSongListUrl(link: string): SiteSongList {
 }
 
 function guessFromSongListNetease(url: Url.Url): string {
-    if (!/playlist$/.test(url.pathname)) {
+    const matches = [/playlist\/?$/, /toplist\/?$/]
+    if (!_.some(matches, it => it.test(url.pathname))) {
         const link = url.hash.replace(/^#/, '')
         url = Url.parse(link)
     }
 
     const id = qs.parse(url.query).id
     const pathname = url.pathname
-    if (id && (pathname.endsWith('toplist') || pathname.endsWith('playlist'))) {
+    if (id && _.some(matches, it => it.test(pathname))) {
         return qs.parse(url.query).id
     }
     throw new Error('netease songlist parse failed')
