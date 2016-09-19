@@ -169,7 +169,7 @@ define({ "api": [
   {
     "type": "POST",
     "url": "/api/songListWithUrl",
-    "title": "songList",
+    "title": "songListWithUrl",
     "name": "songListWithUrl",
     "group": "API",
     "parameter": {

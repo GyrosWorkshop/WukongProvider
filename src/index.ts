@@ -134,7 +134,7 @@ class Controller {
     }
 
     /**
-     * @api {POST} /api/songListWithUrl songList
+     * @api {POST} /api/songListWithUrl songListWithUrl
      * @apiName songListWithUrl
      * @apiGroup API
      * @apiParam {string} url
