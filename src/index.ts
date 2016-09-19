@@ -39,6 +39,7 @@ class Controller {
         app.post('/api/songList', this.wrap(this.songList))
         app.post('/api/userSongLists', this.wrap(this.userSongLists))
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
+        app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
     }
     /**
      * @api {POST} /api/searchSongs search songs
@@ -110,18 +111,41 @@ class Controller {
      * @api {POST} /api/songList songList
      * @apiName songList
      * @apiGroup API
-     * @apiParam {string} url
+     * @apiParam {string} songListId
+     * @apiParam {string} siteId
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songList(req: express.Request) {
+        const {songListId, siteId} = req.body as {
+            songListId: string
+            siteId: string
+        }
+        if (!songListId || !siteId) {
+            throw new Error('IllegalArgumentException siteId or songListId is empty')
+        }
+        const provider = providers.get(siteId)
+        if (!provider) {
+            throw new Error('site provider not exist.')
+        }
+        return provider.getSongList(songListId)
+    }
+
+    /**
+     * @api {POST} /api/songListWithUrl songList
+     * @apiName songListWithUrl
+     * @apiGroup API
+     * @apiParam {string} url
+     * @apiSuccessExample Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *      }
+     */
+    async songListWithUrl(req: express.Request) {
         const {url} = req.body as {
             url: string
-        }
-        if (!url) {
-            throw new Error('IllegalArgumentException siteId or songListId is empty')
         }
         const songList = guessFromSongListUrl(url)
         if (!songList) {
