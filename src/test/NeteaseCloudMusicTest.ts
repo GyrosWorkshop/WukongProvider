@@ -1,5 +1,6 @@
 import {assert} from 'chai'
 import NeteaseCloudMusicProvider from '../providers/NeteaseCloudMusic'
+import {guessFromSongListUrl} from '../utils'
 
 describe('NeteaseCloudMusicProvider', () => {
     const provider = new NeteaseCloudMusicProvider()
@@ -45,6 +46,16 @@ describe('NeteaseCloudMusicProvider', () => {
             assert.equal(songs.siteId, 'netease-cloud-music')
             assert.equal(songs.creator.name, '网易云音乐')
             // assert.equal(songs.songs.length, songs.songCount)
+            assert.isTrue(songs.songs.length > 10)
+        })
+        it('url list', async () => {
+            // should follow 302
+            const link = 'http://music.163.com/#/my/m/music/playlist?id=443490542'
+            const songList = guessFromSongListUrl(link)
+            const songs = await provider.getSongList(songList.songListId)
+            assert.equal(songs.songListId, '443490542')
+            assert.equal(songs.siteId, 'netease-cloud-music')
+            assert.equal(songs.creator.name, 'richard1122')
             assert.isTrue(songs.songs.length > 10)
         })
     })

@@ -1,1 +1,1 @@
-require('../lib/test/test.js')
+require('../src/test/test')

@@ -140,14 +140,7 @@
             "group": "Parameter",
             "type": "string",
             "optional": false,
-            "field": "siteId",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "songListId",
+            "field": "playlistUrl",
             "description": ""
           }
         ]
