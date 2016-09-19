@@ -114,13 +114,13 @@ export default class QQMusicProvider extends BaseProvider {
     private getMaxAvailBitrate(baseInfoFile: any): any {
         const bitrateKeyOrder = [
             [ 320000, 'size_320mp3', 'mp3', 'M800' ],
-            //[ 192000, 'size_192ogg', 'ogg' ],
-            //[ 192000, 'size_192aac', 'aac' ],
+            // [ 192000, 'size_192ogg', 'ogg' ],
+            // [ 192000, 'size_192aac', 'aac' ],
             [ 128000, 'size_128mp3', 'mp3', 'M500' ],
-            //[  96000, 'size_96aac',  'aac' ],
-            //[  48000, 'size_48aac',  'aac' ],
+            // [  96000, 'size_96aac',  'aac' ],
+            // [  48000, 'size_48aac',  'aac' ],
             [ 128000, 'size_128',    'm4a', 'C200' ]
-        ];
+        ]
         for (let it of bitrateKeyOrder) {
             if (baseInfoFile[it[1]]) {
                 return {

@@ -44,7 +44,7 @@ abstract class BaseMusicProvider {
                 }
             })
         } else {
-            dbSong = await Song.create(song);
+            dbSong = await Song.create(song)
         }
 
         if (song.lyrics) {
@@ -79,11 +79,11 @@ abstract class BaseMusicProvider {
                     as: 'lyrics'
                 }
             ]
-        }) as any;
+        }) as any
         if (data && ((needDetail && data.dataValues.detail) || !needDetail)) {
-            return data.dataValues;
+            return data.dataValues
         } else {
-            return null;
+            return null
         }
     }
 

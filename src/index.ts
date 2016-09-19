@@ -22,12 +22,12 @@ http.createServer(app).listen(process.env.port || 3120)
 const providers = new Map<string, BaseMusicProvider>()
 const qqProvider = new QQMusicProvider()
 const neteaseProvider = new NeteaseCloudMusicProvider()
-//const xiamiProvider = new XiamiProvider()
+// const xiamiProvider = new XiamiProvider()
 
 providers.set(qqProvider.providerName, qqProvider)
 // providers.set(GrooveProvider.providerName, new GrooveProvider())
 providers.set(neteaseProvider.providerName, neteaseProvider)
-//providers.set(xiamiProvider.providerName, xiamiProvider)
+// providers.set(xiamiProvider.providerName, xiamiProvider)
 
 @autobind
 class Controller {
