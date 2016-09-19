@@ -5,7 +5,7 @@
     "title": "search songs",
     "name": "SearchSongs",
     "group": "API",
-    "description": "<p>To simplify our provider implementation, only title, artist, album are required.</p>",
+    "description": "<p>To simplify our provider implementation, only title, artist, and album are ensured to be included in the result.</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -33,6 +33,38 @@
         {
           "title": "Error-Response:",
           "content": "HTTP/1.1 400 ERROR\n{\n    \"error\": \"IllegalArgumentException \\\"key\\\" not exist or wrong type.\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/index.ts",
+    "groupTitle": "API"
+  },
+  {
+    "type": "POST",
+    "url": "/api/searchUsers",
+    "title": "searchUsers",
+    "name": "searchUsers",
+    "group": "API",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "key",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n}",
           "type": "json"
         }
       ]
@@ -77,7 +109,85 @@
             "type": "string",
             "optional": true,
             "field": "clientIP",
-            "description": "<p>This is used to route overseas users to proxy server.</p>"
+            "description": "<p>If provided with this, server may take different actions to the file url. E.g. use proxy server to make oversea users happy.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/index.ts",
+    "groupTitle": "API"
+  },
+  {
+    "type": "POST",
+    "url": "/api/songList",
+    "title": "songList",
+    "name": "songList",
+    "group": "API",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "siteId",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "songListId",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "src/index.ts",
+    "groupTitle": "API"
+  },
+  {
+    "type": "POST",
+    "url": "/api/userSongLists",
+    "title": "userSongLists",
+    "name": "userSongLists",
+    "group": "API",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "siteId",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "thirdPartyUserId",
+            "description": ""
           }
         ]
       }
