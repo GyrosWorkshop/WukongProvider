@@ -10,9 +10,9 @@ describe('NeteaseCloudMusicProvider', () => {
                 assert.equal(song.siteId, 'netease-cloud-music')
             }
             assert.equal(songs[0].title, '不为谁而作的歌')
-            assert.equal(songs[0].artist, '徐佳莹, 林俊杰')
+            assert.equal(songs[0].artist, '林俊杰')
             assert.equal(songs[1].title, '不为谁而作的歌')
-            assert.equal(songs[1].artist, '林俊杰')
+            assert.equal(songs[1].artist, '徐佳莹，林俊杰')
         })
     })
     describe('getSongInfo', () => {
@@ -35,6 +35,17 @@ describe('NeteaseCloudMusicProvider', () => {
             assert.equal(song.title, 'おどるポンポコリン')
             assert.equal(song.artist, 'B.B.クイーンズ')
             assert.equal(song.album, 'おどるポンポコリン~ちびまる子ちゃん 誕生25th Version~')
+        })
+    })
+    describe('getSongList', () => {
+        it('top list', async () => {
+            const listId = '3779629'
+            const songs = await provider.getSongList(listId)
+            assert.equal(songs.songListId, listId)
+            assert.equal(songs.siteId, 'netease-cloud-music')
+            assert.equal(songs.creator.name, '网易云音乐')
+            // assert.equal(songs.songs.length, songs.songCount)
+            assert.isTrue(songs.songs.length > 10)
         })
     })
 })
