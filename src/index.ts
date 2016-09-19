@@ -110,7 +110,7 @@ class Controller {
      * @api {POST} /api/songList songList
      * @apiName songList
      * @apiGroup API
-     * @apiParam {string} playlistUrl
+     * @apiParam {string} url
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {

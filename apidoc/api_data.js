@@ -140,7 +140,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "string",
             "optional": false,
-            "field": "playlistUrl",
+            "field": "url",
             "description": ""
           }
         ]
