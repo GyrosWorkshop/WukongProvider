@@ -15,7 +15,7 @@ export function guessFromSongListUrl(link: string): SiteSongList {
 }
 
 function guessFromSongListNetease(url: Url.Url): string {
-    if (url.pathname === null || url.pathname.length === 0) {
+    if (!/playlist$/.test(url.pathname)) {
         const link = url.hash.replace(/^#/, '')
         url = Url.parse(link)
     }

@@ -27,4 +27,11 @@ describe('guessFromSongListUrl', () => {
         const link = 'http://music.163.com/#/my/m/music/playlist?kid=443490542'
         assert.equal(guessFromSongListUrl(link), null)
     })
+    it('qusics test', () => {
+        const link = 'http://music.163.com/#/playlist?id=28613019'
+        assert.deepEqual(guessFromSongListUrl(link), {
+            siteId: 'netease-cloud-music',
+            songListId: '28613019'
+        })
+    })
 })
