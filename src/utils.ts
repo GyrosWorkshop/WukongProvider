@@ -15,8 +15,11 @@ export function guessFromSongListUrl(link: string): SiteSongList {
 }
 
 function guessFromSongListNetease(url: Url.Url): string {
-    const link = url.hash.replace(/^#/, '')
-    url = Url.parse(link)
+    if (url.pathname === null || url.pathname.length === 0) {
+        const link = url.hash.replace(/^#/, '')
+        url = Url.parse(link)
+    }
+
     const id = qs.parse(url.query).id
     const pathname = url.pathname
     if (id && (pathname.endsWith('toplist') || pathname.endsWith('playlist'))) {
