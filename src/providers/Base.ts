@@ -3,7 +3,7 @@
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'
-import * as LRU from 'lru-cache';
+import * as LRU from 'lru-cache'
 import sequelize, {Song, Lyric} from '../db'
 
 abstract class BaseMusicProvider {
