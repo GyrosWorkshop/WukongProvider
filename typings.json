@@ -12,6 +12,7 @@
     "jquery": "registry:dt/jquery#1.10.0+20160704162008",
     "jsdom": "registry:dt/jsdom#2.0.0+20160316155526",
     "lodash": "registry:global/lodash#4.0.0+20160701205107",
+    "lru-cache": "registry:dt/lru-cache#4.0.1+20160812224217",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "mocha": "registry:dt/mocha#2.2.5+20160619032855",
     "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",

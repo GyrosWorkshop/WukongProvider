@@ -18,6 +18,9 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
         const song = await this.getSongInfoOnline(songId)
+        if (!song) {
+            throw new Error('获取歌曲信息失败')
+        }
         await this.save(song)
         return _.omit(song, ['meta', 'detail']) as Wukong.ISong
     }
@@ -28,7 +31,9 @@ export default class XiamiMusicProvider extends BaseProvider {
             url: `http://www.xiami.com/song/playlist/id/${songId}/object_name/default/object_id/0/cat/json`,
             json: true
         })
-        if (!res.status) return null
+        if (!res.status || _.isNull(res.data.trackList)) {
+            throw new Error('XiamiProvider: 获取错误-' + res.message)
+        }
         const onlineSong: any = res.data.trackList[0]
         const song = {} as Wukong.ISong
         song.siteId = this.providerName
@@ -60,7 +65,7 @@ export default class XiamiMusicProvider extends BaseProvider {
             else position = rightRows * (columns + 1) + (x - rightRows) *columns + y
             ans.push(arr[position])
         }
-        //Fixme: replace to HQ music not working.
+        // FIXME: replace to HQ music not working.
         return decodeURIComponent(ans.join('')).replace(/\^/g, '0')//.replace('//m5', '//m6').replace('l.mp3', 'h.mp3')
     }
 

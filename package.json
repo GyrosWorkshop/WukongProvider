@@ -32,6 +32,7 @@
     "html-entities": "^1.2.0",
     "jsdom": "^9.3.0",
     "lodash": "^4.13.1",
+    "lru-cache": "^4.0.1",
     "moment-timezone": "^0.5.5",
     "morgan": "^1.7.0",
     "node-cache": "^3.2.1",

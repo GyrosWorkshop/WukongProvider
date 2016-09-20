@@ -3,15 +3,20 @@
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'
+import * as LRU from 'lru-cache';
 import sequelize, {Song, Lyric} from '../db'
-
-
 
 abstract class BaseMusicProvider {
     /**
      * set provider name, eg: netease-cloud-music
      */
     abstract get providerName(): string
+
+    private previousErrorSongRequest = LRU({
+        max: 50,
+        maxAge: 1000 * 3
+
+    })
 
     protected RequestOptions: Request.CoreOptions = {
         headers: {
