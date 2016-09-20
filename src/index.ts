@@ -3,6 +3,8 @@ import QQMusicProvider from './providers/QQMusic'
 import GrooveProvider from './providers/Groove'
 import XiamiProvider from './providers/Xiami'
 import BaseMusicProvider from './providers/Base'
+import {guessFromSongListUrl} from './utils'
+
 import * as _ from 'lodash'
 import * as express from 'express'
 import * as morgan from 'morgan'
@@ -37,6 +39,7 @@ class Controller {
         app.post('/api/songList', this.wrap(this.songList))
         app.post('/api/userSongLists', this.wrap(this.userSongLists))
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
+        app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
     }
     /**
      * @api {POST} /api/searchSongs search songs
@@ -108,19 +111,19 @@ class Controller {
      * @api {POST} /api/songList songList
      * @apiName songList
      * @apiGroup API
-     * @apiParam {string} siteId
      * @apiParam {string} songListId
+     * @apiParam {string} siteId
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songList(req: express.Request) {
-        const {siteId, songListId} = req.body as {
-            siteId: string,
+        const {songListId, siteId} = req.body as {
             songListId: string
+            siteId: string
         }
-        if (!siteId || !songListId) {
+        if (!songListId || !siteId) {
             throw new Error('IllegalArgumentException siteId or songListId is empty')
         }
         const provider = providers.get(siteId)
@@ -128,6 +131,31 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         return provider.getSongList(songListId)
+    }
+
+    /**
+     * @api {POST} /api/songListWithUrl songListWithUrl
+     * @apiName songListWithUrl
+     * @apiGroup API
+     * @apiParam {string} url
+     * @apiSuccessExample Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *      }
+     */
+    async songListWithUrl(req: express.Request) {
+        const {url} = req.body as {
+            url: string
+        }
+        const songList = guessFromSongListUrl(url)
+        if (!songList) {
+            throw new Error('songlist parse failed')
+        }
+        const provider = providers.get(songList.siteId)
+        if (!provider) {
+            throw new Error('site provider not exist.')
+        }
+        return provider.getSongList(songList.songListId)
     }
 
     /**

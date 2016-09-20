@@ -57,16 +57,16 @@ export default class XiamiMusicProvider extends BaseProvider {
         const rightRows = arr.length % rows
         let iteration = 0
         const ans: Array<string> = []
-        for (let i = 0; i != arr.length; ++i) {
+        for (let i = 0; i !== arr.length; ++i) {
             const x = i % rows
             const y = Math.floor(i / rows)
             let position: number
             if (x <= rightRows) position = x * (columns + 1) + y
-            else position = rightRows * (columns + 1) + (x - rightRows) *columns + y
+            else position = rightRows * (columns + 1) + (x - rightRows) * columns + y
             ans.push(arr[position])
         }
-        // FIXME: replace to HQ music not working.
-        return decodeURIComponent(ans.join('')).replace(/\^/g, '0')//.replace('//m5', '//m6').replace('l.mp3', 'h.mp3')
+        // Fixme: replace to HQ music not working.
+        return decodeURIComponent(ans.join('')).replace(/\^/g, '0')// replace('//m5', '//m6').replace('l.mp3', 'h.mp3')
     }
 
     async searchSongs(keywords: string, offset: number = 0, limit: number = 30): Promise<Array<Wukong.ISong>> {
