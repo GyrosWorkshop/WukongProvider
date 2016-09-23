@@ -15,6 +15,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
     static apiPrefix = serverConfig['netease-cloud-music-api-prefix']
     static binCdn = serverConfig['netease-cloud-music-bin-cdn']
+    static cacheCdn = serverConfig['netease-cloud-music-cache-cdn']
     static imageSize = 400
 
     // from: https://github.com/Zazama/Netease-Downloader/blob/master/index.html
@@ -312,7 +313,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string, overseas: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string, overseas: boolean, useCdn: boolean): Promise<string> {
         const song = await this.getSongInfo(songId)
         let body = NeteaseCloudMusicProvider.encryptRequest({
             ids: [songId],
@@ -327,8 +328,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             form: body
         })
         song.file = resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString()
-        if (NeteaseCloudMusicProvider.binCdn && song.file) {
+        if (overseas && NeteaseCloudMusicProvider.binCdn) {
             song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
+        } else if (useCdn) {
+            song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.cacheCdn + '/')
         }
         return song.file
     }

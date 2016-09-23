@@ -64,7 +64,7 @@ export default class GrooveProvider extends BaseProvider {
         return this.mapToISong((JSON.parse(result).Tracks.Items as Array<any>)[0])
     }
 
-    async getPlayingUrl(songId: string, oversaes: boolean): Promise<string> {
+    async getPlayingUrl(songId: string, oversaes: boolean, useCdn: boolean): Promise<string> {
         let accessToken = await this.getAccessToken()
         const result = await this.sendRequest({
             url: `https://music.xboxlive.com/1/content/${songId}/preview`,

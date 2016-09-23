@@ -176,7 +176,7 @@ export default class QQMusicProvider extends BaseProvider {
         return `https://i.gtimg.cn/music/photo/mid_album_300/${imgId[imgId.length - 2]}/${imgId[imgId.length - 1]}/${imgId}.jpg`
     }
 
-    public async getPlayingUrl(songId: string, overseas: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string, overseas: boolean, useCdn: boolean): Promise<string> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
             url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
