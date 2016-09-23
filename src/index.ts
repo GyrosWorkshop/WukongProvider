@@ -64,6 +64,7 @@ class Controller {
         if (!_.isString(key) || _.isEmpty(key)) {
             throw new Error('IllegalArgumentException "key" not exist or wrong type.')
         }
+        console.log('Request searchSongs', key)
         const result = await Promise.all<Wukong.ISong[]>([...providers].map(([, it]) => it.searchSongs(key)))
         const data = _.uniqBy(
             Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it),
@@ -101,6 +102,7 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
+        console.log('Request songInfo', req.body);
         const overseas = await this.checkOverseas(clientIP)
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
@@ -113,21 +115,22 @@ class Controller {
      * @api {POST} /api/songList songList
      * @apiName songList
      * @apiGroup API
-     * @apiParam {string} songListId
      * @apiParam {string} siteId
+     * @apiParam {string} songListId
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songList(req: express.Request) {
-        const {songListId, siteId} = req.body as {
-            songListId: string
+        const {siteId, songListId} = req.body as {
             siteId: string
+            songListId: string
         }
-        if (!songListId || !siteId) {
+        if (!siteId || !songListId) {
             throw new Error('IllegalArgumentException siteId or songListId is empty')
         }
+        console.log('Request songList', req.body)
         const provider = providers.get(siteId)
         if (!provider) {
             throw new Error('site provider not exist.')
@@ -157,6 +160,7 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
+        console.log('Request songListWithUrl', url)
         return provider.getSongList(songList.songListId)
     }
 
@@ -183,6 +187,7 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
+        console.log('Request userSongLists', req.body)
         return provider.getUserSongLists(thirdPartyUserId)
     }
 
@@ -203,6 +208,7 @@ class Controller {
         if (!_.isString(key) || _.isEmpty(key)) {
             throw new Error('IllegalArgumentException key not exist or wrong type.')
         }
+        console.log('Request searchUsers', key)
         const result = await Promise.all<Wukong.IThirdPartyUser[]>([...providers].map(([, it]) => it.searchUsers(key)))
         const data = Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it)
         return data
