@@ -176,7 +176,7 @@ export default class QQMusicProvider extends BaseProvider {
         return `https://i.gtimg.cn/music/photo/mid_album_300/${imgId[imgId.length - 2]}/${imgId[imgId.length - 1]}/${imgId}.jpg`
     }
 
-    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.ISongFiles> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
             url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
@@ -195,7 +195,9 @@ export default class QQMusicProvider extends BaseProvider {
         const baseInfo: any = await this.getBaseInfo(songId)
         const bitrateInfo = this.getMaxAvailBitrate(baseInfo.file)
         const key: string = JSON.parse(result.replace(/^jsonCallback\((.*)\);$/, '$1')).key
-        return `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
+        return {
+            file: `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
+        }
     }
 
     // TODO

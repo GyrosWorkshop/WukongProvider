@@ -106,7 +106,7 @@ class Controller {
         const overseas = await this.checkOverseas(clientIP)
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
-            song.file = await provider.getPlayingUrl(songId, overseas, useCdn)
+            Object.assign(song, await provider.getPlayingUrl(songId))
         }
         return song
     }

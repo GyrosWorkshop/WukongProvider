@@ -90,9 +90,11 @@ export default class XiamiMusicProvider extends BaseProvider {
         return null
     }
 
-    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.ISongFiles> {
         const song = await this.load(songId, true)
-        return this.parsePlayingUrl(JSON.parse(song.meta).location)
+        return {
+            file: this.parsePlayingUrl(JSON.parse(song.meta).location)
+        }
     }
 
     private async searchSongsOnlne(token: string, key: string): Promise<Array<Wukong.ISong>> {
