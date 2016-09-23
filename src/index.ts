@@ -102,7 +102,7 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
-        console.log('Request songInfo', req.body);
+        console.log('Request songInfo', req.body)
         const overseas = await this.checkOverseas(clientIP)
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
