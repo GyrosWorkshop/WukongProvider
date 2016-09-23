@@ -103,7 +103,6 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         console.log('Request songInfo', req.body)
-        const overseas = await this.checkOverseas(clientIP)
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
             Object.assign(song, await provider.getPlayingUrl(songId))
@@ -226,16 +225,6 @@ class Controller {
                 })
             }
         }
-    }
-
-    private async checkOverseas(ip?: string) {
-        if (!ip || ip.length === 0) return false
-        const ans = await rp({
-            url: `http://ip-api.com/json/${ip}`,
-            json: true,
-            method: 'GET'
-        })
-        return ans.status === 'success' && ans.countryCode !== 'CN'
     }
 }
 

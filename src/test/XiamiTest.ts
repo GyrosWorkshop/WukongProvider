@@ -24,7 +24,7 @@ describe('XiamiMusicProvider', () => {
     })
     describe('playing url', () => {
         it('playing url', async () => {
-            const url = await provider.getPlayingUrl('1770409076', false)
+            const url = await provider.getPlayingUrl('1770409076')
             assert.isString(url.file)
             assert.isTrue(url.file.startsWith('http'))
         })
