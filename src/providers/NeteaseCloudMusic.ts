@@ -312,7 +312,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string, overseas: boolean, useCdn: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<string> {
         const song = await this.getSongInfo(songId)
         let body = NeteaseCloudMusicProvider.encryptRequest({
             ids: [songId],
