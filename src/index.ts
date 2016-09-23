@@ -80,20 +80,16 @@ class Controller {
      * @apiParam {string} siteId
      * @apiParam {string} songId
      * @apiParam {Boolean} [withFileUrl=false]
-     * @apiParam {string} [clientIP] If provided with this, server may take different actions to the file url. E.g. use proxy server to make oversea users happy.
-     * @apiParam {string} [useCdn=false] If set to true, a CDN server will be used anyway.
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songInfo(req: express.Request) {
-        const {siteId, songId, withFileUrl = false, clientIP, useCdn} = req.body as {
+        const {siteId, songId, withFileUrl = false} = req.body as {
             siteId: string,
             songId: string,
-            withFileUrl: boolean,
-            clientIP: string,
-            useCdn: boolean
+            withFileUrl: boolean
         }
         if (!siteId || !songId) {
             throw new Error('IllegalArgumentException siteId or songId is not valid.')
