@@ -15,7 +15,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
     static apiPrefix = serverConfig['netease-cloud-music-api-prefix']
     static binCdn = serverConfig['netease-cloud-music-bin-cdn']
-    static cacheCdn = serverConfig['netease-cloud-music-cache-cdn']
     static imageSize = 400
 
     // from: https://github.com/Zazama/Netease-Downloader/blob/master/index.html
@@ -331,7 +330,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         if (overseas && NeteaseCloudMusicProvider.binCdn) {
             song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
         } else if (useCdn) {
-            song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.cacheCdn + '/')
+            song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + '&cachecdn=1'
         }
         return song.file
     }
