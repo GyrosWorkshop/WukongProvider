@@ -41,10 +41,12 @@ export default class XiamiMusicProvider extends BaseProvider {
         song.title = onlineSong.songName
         song.album = onlineSong.album_name
         song.artist = onlineSong.artist || this.entities.decode(onlineSong.artist_name)
-        song.artwork = onlineSong.album_pic
+        song.artwork = {
+            file: onlineSong.album_pic
+        }
         song.bitrate = 128000
         song.length = onlineSong.length * 1000
-        song.file = ''
+        song.music = null
         song.lyrics = await this.getSongLyrics(onlineSong.lyric_url)
         return Object.assign(song, {meta: JSON.stringify(onlineSong), detail: true})
     }
@@ -90,7 +92,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         return null
     }
 
-    public async getPlayingUrl(songId: string): Promise<Wukong.ISongFiles> {
+    public async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
         const song = await this.load(songId, true)
         return {
             file: this.parsePlayingUrl(JSON.parse(song.meta).location)
@@ -118,13 +120,16 @@ export default class XiamiMusicProvider extends BaseProvider {
         })
         if (!res || res.state) return []
         return res.data.songs.map((it: any) => {
+            it.album_logo = it.album_logo.replace('1.jpg', '4.jpg')     // high resolution
             return {
                 songId: it.song_id,
                 siteId: this.providerName,
                 title: it.song_name,
                 album: it.album_name,
                 artist: it.artist_name,
-                artwork: it.album_logo.replace('1.jpg', '4.jpg'),   // get larger size
+                artwork: {
+                    file: it.album_logo
+                },
                 bitrate: 128000,
                 length: 0.0
             } as Wukong.ISong

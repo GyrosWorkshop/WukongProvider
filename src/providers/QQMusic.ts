@@ -104,8 +104,8 @@ export default class QQMusicProvider extends BaseProvider {
         song.length = Math.floor(parseFloat(baseInfo.interval) * 1000)
         song.siteId = this.providerName
         song.songId = songId
-        song.file = ''
-        song.artwork = this.getArtworkUrl(baseInfo.album.mid)
+        song.music = null
+        song.artwork = { file: this.getArtworkUrl(baseInfo.album.mid) }
         song.bitrate = this.getMaxAvailBitrate(baseInfo.file).bitrate
         song.lyrics = await this.getSongLyrics(songId)
         return song
@@ -150,8 +150,8 @@ export default class QQMusicProvider extends BaseProvider {
         song.length = Math.floor(parseFloat(f[7]) * 1000)
         song.siteId = this.providerName
         song.songId = f[20]
-        song.file = ''
-        song.artwork = this.getArtworkUrl(imgId)
+        song.music = null
+        song.artwork = { file: this.getArtworkUrl(imgId) }
         song.bitrate = parseInt(f[13])
         return song
     }
@@ -176,7 +176,7 @@ export default class QQMusicProvider extends BaseProvider {
         return `https://i.gtimg.cn/music/photo/mid_album_300/${imgId[imgId.length - 2]}/${imgId[imgId.length - 1]}/${imgId}.jpg`
     }
 
-    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.ISongFiles> {
+    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.IFiles> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
             url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',

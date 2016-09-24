@@ -11,15 +11,14 @@ declare namespace Wukong {
         artist: string
         album: string
 
-        file?: string
-        fileWithCdn?: string
-        artwork?: string
+        music?: IFiles
+        artwork?: IFiles
         length?: number
         // bitrate: number like 96000 (represents 96kpbs), 192000, 320000, etc.
         bitrate?: number
         lyrics?: ILyric[]
     }
-    export interface ISongFiles {
+    export interface IFiles {
         file: string
         fileViaCdn?: string
     }

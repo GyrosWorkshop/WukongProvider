@@ -148,7 +148,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 file: musicUrl,
                 artist: o.artists && o.artists.map((a: any) => a.name).join('，'),
                 album: o.album && o.album.name,
-                artwork: albumUrl,
+                artwork: this.getFiles(albumUrl),
                 length: songLength,
                 bitrate
             }
@@ -186,7 +186,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                     file: null,
                     artist: o.ar && o.ar.map((a: any) => a.name).join('，'),
                     album: o.al && o.al.name,
-                    artwork: albumUrl,
+                    artwork: this.getFiles(albumUrl),
                     length: songLength,
                     bitrate
                 }
@@ -194,6 +194,13 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 return null
             }
         }).filter((o) => <any>o)
+    }
+
+    private getFiles(url: string): Wukong.IFiles {
+        return {
+            file: url,
+            fileViaCdn: url.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + '&cachecdn=1'
+        }
     }
 
     private convertLyric(rawData: any, translate: boolean, withTimeline: boolean): Wukong.ILyric {
@@ -312,7 +319,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string): Promise<Wukong.ISongFiles> {
+    public async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
         const song = await this.getSongInfo(songId)
         let body = NeteaseCloudMusicProvider.encryptRequest({
             ids: [songId],
@@ -326,12 +333,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             },
             form: body
         })
-        song.file = resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString()
-        song.fileWithCdn = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + '&cachecdn=1'
-        return {
-            file: song.file,
-            fileViaCdn: song.fileWithCdn
-        }
+        return this.getFiles(resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString())
     }
 
     protected async sendRequest(options: Request.Options): Promise<any> {

@@ -101,7 +101,7 @@ class Controller {
         console.log('Request songInfo', req.body)
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
-            Object.assign(song, await provider.getPlayingUrl(songId))
+            song.music = await provider.getPlayingUrl(songId)
         }
         return song
     }
