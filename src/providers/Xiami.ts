@@ -17,11 +17,14 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
-        const song = await this.getSongInfoOnline(songId)
+        let song: Wukong.ISong = await this.load(songId, true)
         if (!song) {
-            throw new Error('获取歌曲信息失败')
+            song = await this.getSongInfoOnline(songId)
+            if (!song) {
+                throw new Error('获取歌曲信息失败')
+            }
+            await this.save(song)
         }
-        await this.save(song)
         return _.omit(song, ['meta', 'detail']) as Wukong.ISong
     }
 

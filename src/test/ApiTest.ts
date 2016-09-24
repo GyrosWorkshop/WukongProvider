@@ -81,7 +81,7 @@ describe('API', () => {
             },
             json: true
         })
-        assert.isString(res.file)
+        assert.isString(res.music.file)
     })
     it('get url QQ', async () => {
         const res = await rp({
@@ -94,7 +94,7 @@ describe('API', () => {
             },
             json: true
         })
-        assert.isString(res.file)
+        assert.isString(res.music.file)
     })
     it('wrong provider', async () => {
         try {
@@ -163,8 +163,8 @@ describe('API', () => {
         assert.equal(song.songId, '1770409076')
         assert.equal(song.title, '魔鬼中的天使')
         assert.equal(song.artist, '田馥甄')
-        assert.isString(song.artwork)
-        assert.isString(song.file)
-        assert.isTrue(song.file.startsWith('http'))
+        assert.isString(song.artwork.file)
+        assert.isString(song.music.file)
+        assert.isTrue(song.music.file.startsWith('http'))
     })
 })

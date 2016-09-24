@@ -315,6 +315,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             Object.assign(song, { detail: true })
             await this.save(song)
             if (!song) return null
+        } else {
+            song.artwork = this.getFiles(song.artwork.file)
         }
         return song
     }

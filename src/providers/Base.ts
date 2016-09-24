@@ -3,7 +3,7 @@
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'
-import * as LRU from 'lru-cache'
+// import * as LRU from 'lru-cache'
 import sequelize, {Song, Lyric} from '../db'
 
 abstract class BaseMusicProvider {
@@ -12,11 +12,11 @@ abstract class BaseMusicProvider {
      */
     abstract get providerName(): string
 
-    private previousErrorSongRequest = LRU({
-        max: 50,
-        maxAge: 1000 * 3
+    // private previousErrorSongRequest = LRU({
+    //     max: 50,
+    //     maxAge: 1000 * 3
 
-    })
+    // })
 
     protected RequestOptions: Request.CoreOptions = {
         headers: {
@@ -35,31 +35,33 @@ abstract class BaseMusicProvider {
      * Currently only new one created. (update not available)
      */
     protected async save(song: Wukong.ISong & {meta?: string, detail?: boolean}): Promise<void> {
+        const saveSong: Wukong.ISong = _.cloneDeep(song)
+        if (!_.isString(saveSong.artwork)) saveSong.artwork = (<any>saveSong.artwork).file
         let dbSong = await Song.findOne({
             where: {
-                songId: song.songId,
-                siteId: song.siteId
+                songId: saveSong.songId,
+                siteId: saveSong.siteId
             }
         }) as any
         if (dbSong) {
-            await Song.update(song, {
+            await Song.update(saveSong, {
                 where: {
-                    songId: song.songId,
-                    siteId: song.siteId
+                    songId: saveSong.songId,
+                    siteId: saveSong.siteId
                 }
             })
         } else {
-            dbSong = await Song.create(song)
+            dbSong = await Song.create(saveSong)
         }
 
-        if (song.lyrics) {
+        if (saveSong.lyrics) {
             const songKey = dbSong.getDataValue('id')
             await Lyric.destroy({
                 where: {
                     songId: songKey
                 }
             })
-            await Lyric.bulkCreate(song.lyrics.map(it => Object.assign(it, { songId: songKey })))
+            await Lyric.bulkCreate(saveSong.lyrics.map(it => Object.assign(it, { songId: songKey })))
         }
     }
 
@@ -86,7 +88,9 @@ abstract class BaseMusicProvider {
             ]
         }) as any
         if (data && ((needDetail && data.dataValues.detail) || !needDetail)) {
-            return data.dataValues
+            const song = data.dataValues
+            if (_.isString(song.artwork)) song.artwork = { file: song.artwork }
+            return song
         } else {
             return null
         }
