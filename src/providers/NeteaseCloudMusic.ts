@@ -312,7 +312,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string, overseas: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string): Promise<Wukong.ISongFiles> {
         const song = await this.getSongInfo(songId)
         let body = NeteaseCloudMusicProvider.encryptRequest({
             ids: [songId],
@@ -327,10 +327,11 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             form: body
         })
         song.file = resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString()
-        if (NeteaseCloudMusicProvider.binCdn && song.file) {
-            song.file = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
+        song.fileWithCdn = song.file.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + '&cachecdn=1'
+        return {
+            file: song.file,
+            fileViaCdn: song.fileWithCdn
         }
-        return song.file
     }
 
     protected async sendRequest(options: Request.Options): Promise<any> {

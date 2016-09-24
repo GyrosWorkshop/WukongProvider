@@ -2,7 +2,7 @@ import * as rp from 'request-promise'
 import {assert} from 'chai'
 
 describe('API', () => {
-    let lyric: Array<Wukong.ILyric>;
+    let lyric: Array<Wukong.ILyric>
     it('get info netease', async () => {
         const res = await rp({
             url: 'http://localhost:3120/api/songInfo',

@@ -114,13 +114,13 @@ export default class QQMusicProvider extends BaseProvider {
     private getMaxAvailBitrate(baseInfoFile: any): any {
         const bitrateKeyOrder = [
             [ 320000, 'size_320mp3', 'mp3', 'M800' ],
-            //[ 192000, 'size_192ogg', 'ogg' ],
-            //[ 192000, 'size_192aac', 'aac' ],
+            // [ 192000, 'size_192ogg', 'ogg' ],
+            // [ 192000, 'size_192aac', 'aac' ],
             [ 128000, 'size_128mp3', 'mp3', 'M500' ],
-            //[  96000, 'size_96aac',  'aac' ],
-            //[  48000, 'size_48aac',  'aac' ],
+            // [  96000, 'size_96aac',  'aac' ],
+            // [  48000, 'size_48aac',  'aac' ],
             [ 128000, 'size_128',    'm4a', 'C200' ]
-        ];
+        ]
         for (let it of bitrateKeyOrder) {
             if (baseInfoFile[it[1]]) {
                 return {
@@ -176,7 +176,7 @@ export default class QQMusicProvider extends BaseProvider {
         return `https://i.gtimg.cn/music/photo/mid_album_300/${imgId[imgId.length - 2]}/${imgId[imgId.length - 1]}/${imgId}.jpg`
     }
 
-    public async getPlayingUrl(songId: string, overseas: boolean): Promise<string> {
+    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.ISongFiles> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
             url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
@@ -195,7 +195,9 @@ export default class QQMusicProvider extends BaseProvider {
         const baseInfo: any = await this.getBaseInfo(songId)
         const bitrateInfo = this.getMaxAvailBitrate(baseInfo.file)
         const key: string = JSON.parse(result.replace(/^jsonCallback\((.*)\);$/, '$1')).key
-        return `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
+        return {
+            file: `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
+        }
     }
 
     // TODO

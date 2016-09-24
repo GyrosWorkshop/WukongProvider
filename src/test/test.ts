@@ -4,4 +4,5 @@ if (process.env.api) {
     require('./QQMusicTest')
     require('./NeteaseCloudMusicTest')
     require('./XiamiTest')
+    require('./utilsTest')
 }

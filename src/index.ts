@@ -3,6 +3,8 @@ import QQMusicProvider from './providers/QQMusic'
 import GrooveProvider from './providers/Groove'
 import XiamiProvider from './providers/Xiami'
 import BaseMusicProvider from './providers/Base'
+import {guessFromSongListUrl} from './utils'
+
 import * as _ from 'lodash'
 import * as express from 'express'
 import * as morgan from 'morgan'
@@ -37,6 +39,7 @@ class Controller {
         app.post('/api/songList', this.wrap(this.songList))
         app.post('/api/userSongLists', this.wrap(this.userSongLists))
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
+        app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
     }
     /**
      * @api {POST} /api/searchSongs search songs
@@ -61,6 +64,7 @@ class Controller {
         if (!_.isString(key) || _.isEmpty(key)) {
             throw new Error('IllegalArgumentException "key" not exist or wrong type.')
         }
+        console.log('Request searchSongs', key)
         const result = await Promise.all<Wukong.ISong[]>([...providers].map(([, it]) => it.searchSongs(key)))
         const data = _.uniqBy(
             Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it),
@@ -76,18 +80,16 @@ class Controller {
      * @apiParam {string} siteId
      * @apiParam {string} songId
      * @apiParam {Boolean} [withFileUrl=false]
-     * @apiParam {string} [clientIP] If provided with this, server may take different actions to the file url. E.g. use proxy server to make oversea users happy.
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songInfo(req: express.Request) {
-        const {siteId, songId, withFileUrl = false, clientIP} = req.body as {
+        const {siteId, songId, withFileUrl = false} = req.body as {
             siteId: string,
             songId: string,
-            withFileUrl: boolean,
-            clientIP: string
+            withFileUrl: boolean
         }
         if (!siteId || !songId) {
             throw new Error('IllegalArgumentException siteId or songId is not valid.')
@@ -96,10 +98,10 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
-        const overseas = await this.checkOverseas(clientIP)
+        console.log('Request songInfo', req.body)
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
-            song.file = await provider.getPlayingUrl(songId, overseas)
+            Object.assign(song, await provider.getPlayingUrl(songId))
         }
         return song
     }
@@ -117,17 +119,44 @@ class Controller {
      */
     async songList(req: express.Request) {
         const {siteId, songListId} = req.body as {
-            siteId: string,
+            siteId: string
             songListId: string
         }
         if (!siteId || !songListId) {
             throw new Error('IllegalArgumentException siteId or songListId is empty')
         }
+        console.log('Request songList', req.body)
         const provider = providers.get(siteId)
         if (!provider) {
             throw new Error('site provider not exist.')
         }
         return provider.getSongList(songListId)
+    }
+
+    /**
+     * @api {POST} /api/songListWithUrl songListWithUrl
+     * @apiName songListWithUrl
+     * @apiGroup API
+     * @apiParam {string} url
+     * @apiSuccessExample Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *      }
+     */
+    async songListWithUrl(req: express.Request) {
+        const {url} = req.body as {
+            url: string
+        }
+        const songList = guessFromSongListUrl(url)
+        if (!songList) {
+            throw new Error('songlist parse failed')
+        }
+        const provider = providers.get(songList.siteId)
+        if (!provider) {
+            throw new Error('site provider not exist.')
+        }
+        console.log('Request songListWithUrl', url)
+        return provider.getSongList(songList.songListId)
     }
 
     /**
@@ -153,6 +182,7 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
+        console.log('Request userSongLists', req.body)
         return provider.getUserSongLists(thirdPartyUserId)
     }
 
@@ -173,6 +203,7 @@ class Controller {
         if (!_.isString(key) || _.isEmpty(key)) {
             throw new Error('IllegalArgumentException key not exist or wrong type.')
         }
+        console.log('Request searchUsers', key)
         const result = await Promise.all<Wukong.IThirdPartyUser[]>([...providers].map(([, it]) => it.searchUsers(key)))
         const data = Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it)
         return data
@@ -190,16 +221,6 @@ class Controller {
                 })
             }
         }
-    }
-
-    private async checkOverseas(ip?: string) {
-        if (!ip || ip.length === 0) return false
-        const ans = await rp({
-            url: `http://ip-api.com/json/${ip}`,
-            json: true,
-            method: 'GET'
-        })
-        return ans.status === 'success' && ans.countryCode !== 'CN'
     }
 }
 

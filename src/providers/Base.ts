@@ -49,7 +49,7 @@ abstract class BaseMusicProvider {
                 }
             })
         } else {
-            dbSong = await Song.create(song);
+            dbSong = await Song.create(song)
         }
 
         if (song.lyrics) {
@@ -84,11 +84,11 @@ abstract class BaseMusicProvider {
                     as: 'lyrics'
                 }
             ]
-        }) as any;
+        }) as any
         if (data && ((needDetail && data.dataValues.detail) || !needDetail)) {
-            return data.dataValues;
+            return data.dataValues
         } else {
-            return null;
+            return null
         }
     }
 
@@ -99,7 +99,7 @@ abstract class BaseMusicProvider {
     abstract async searchSongs(searchKey: string, offset: number, limit: number): Promise<Array<Wukong.ISong>>
     abstract async searchSongs(searchKey: string): Promise<Array<Wukong.ISong>>
     abstract async getSongInfo(songId: string): Promise<Wukong.ISong>
-    abstract async getPlayingUrl(songId: string, ovserseas: boolean): Promise<string>
+    abstract async getPlayingUrl(songId: string): Promise<Wukong.ISongFiles>
     abstract async getSongList(songListId: string): Promise<Wukong.ISongList>
     abstract async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]>
     abstract async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]>
