@@ -175,7 +175,7 @@ export default class QQMusicProvider extends BaseProvider {
     }
 
     private getArtworkUrl(imgId: string): string {
-        return `http://i.gtimg.cn/music/photo/mid_album_300/${imgId[imgId.length - 2]}/${imgId[imgId.length - 1]}/${imgId}.jpg`
+        return 'http://y.gtimg.cn/music/photo_new/' + 'T002' + 'R300x300' + 'M000' + imgId + '.jpg' + '?max_age=2592000'
     }
 
     public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.IFiles> {
