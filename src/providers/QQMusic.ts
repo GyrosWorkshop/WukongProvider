@@ -203,7 +203,7 @@ export default class QQMusicProvider extends BaseProvider {
     }
 
     public getWebUrl(songId: string): string {
-        return `http://y.qq.com/portal/album/${songId}.html`
+        return `http://y.qq.com/portal/song/${songId}.html`
     }
 
     // TODO
