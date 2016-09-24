@@ -74,7 +74,7 @@ abstract class BaseMusicProvider {
         }
     }
 
-    protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
+    protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong> {
         const data = await Song.findOne({
             where: {
                 songId: songId,
@@ -88,9 +88,7 @@ abstract class BaseMusicProvider {
             ]
         }) as any
         if (data && ((needDetail && data.dataValues.detail) || !needDetail)) {
-            const song = data.dataValues
-            if (_.isString(song.artwork)) song.artwork = { file: song.artwork }
-            return song
+            return this.formatRow(data.dataValues)
         } else {
             return null
         }
@@ -107,6 +105,13 @@ abstract class BaseMusicProvider {
     abstract async getSongList(songListId: string): Promise<Wukong.ISongList>
     abstract async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]>
     abstract async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]>
+
+    abstract getWebUrl(songId: string): string
+    private formatRow(song: Wukong.ISong | any): Wukong.ISong {
+        if (_.isString(song.artwork)) song.artwork = { file: song.artwork }
+        song.webUrl = this.getWebUrl(song.songId)
+        return song
+    }
 }
 
 export default BaseMusicProvider

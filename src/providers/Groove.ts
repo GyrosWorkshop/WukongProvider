@@ -102,5 +102,8 @@ export default class GrooveProvider extends BaseProvider {
 
     // TODO
     public async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]> { return null }
+
+    // TODO
+    public getWebUrl(songId: string): string { return null }
 }
 

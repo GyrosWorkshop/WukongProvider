@@ -47,6 +47,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         song.artwork = {
             file: onlineSong.album_pic
         }
+        song.webUrl = this.getWebUrl(songId)
         song.bitrate = 128000
         song.length = onlineSong.length * 1000
         song.music = null
@@ -96,7 +97,7 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     public async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
-        const song = await this.load(songId, true)
+        const song = await this.load(songId, true) as Wukong.ISong & { meta: any }
         return {
             file: this.parsePlayingUrl(JSON.parse(song.meta).location)
         }
@@ -133,6 +134,7 @@ export default class XiamiMusicProvider extends BaseProvider {
                 artwork: {
                     file: it.album_logo
                 },
+                webUrl: this.getWebUrl(it.song_id),
                 bitrate: 128000,
                 length: 0.0
             } as Wukong.ISong
@@ -147,6 +149,10 @@ export default class XiamiMusicProvider extends BaseProvider {
         })
         const cookies = jar.getCookieString('http://xiami.com').split('=')[1]
         return cookies
+    }
+
+    public getWebUrl(songId: string): string {
+        return `http://www.xiami.com/song/${songId}`
     }
 
     // TODO

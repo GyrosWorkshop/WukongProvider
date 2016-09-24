@@ -106,6 +106,7 @@ export default class QQMusicProvider extends BaseProvider {
         song.songId = songId
         song.music = null
         song.artwork = { file: this.getArtworkUrl(baseInfo.album.mid) }
+        song.webUrl = this.getWebUrl(songId)
         song.bitrate = this.getMaxAvailBitrate(baseInfo.file).bitrate
         song.lyrics = await this.getSongLyrics(songId)
         return song
@@ -152,6 +153,7 @@ export default class QQMusicProvider extends BaseProvider {
         song.songId = f[20]
         song.music = null
         song.artwork = { file: this.getArtworkUrl(imgId) }
+        song.webUrl = this.getWebUrl(song.songId)
         song.bitrate = parseInt(f[13])
         return song
     }
@@ -198,6 +200,10 @@ export default class QQMusicProvider extends BaseProvider {
         return {
             file: `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
         }
+    }
+
+    public getWebUrl(songId: string): string {
+        return `http://y.qq.com/portal/album/${songId}.html`
     }
 
     // TODO

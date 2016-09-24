@@ -10,6 +10,7 @@ declare namespace Wukong {
         title: string
         artist: string
         album: string
+        webUrl?: string
 
         music?: IFiles
         artwork?: IFiles

@@ -140,15 +140,17 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
                 musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
             }
-            let songLength = o.duration
+            const songLength = o.duration
+            const songId = o.id.toString()
             return {
                 siteId: this.providerName,
-                songId: o.id.toString(),
+                songId,
                 title: o.name,
                 file: musicUrl,
                 artist: o.artists && o.artists.map((a: any) => a.name).join('，'),
                 album: o.album && o.album.name,
                 artwork: this.getFiles(albumUrl),
+                webUrl: this.getWebUrl(songId),
                 length: songLength,
                 bitrate
             }
@@ -177,16 +179,18 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
                 musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
             }
-            let songLength = o.dt
+            const songLength = o.dt
+            const songId = o.id.toString()
             if (musicAvail) {
                 return {
                     siteId: this.providerName,
-                    songId: o.id.toString(),
+                    songId: songId,
                     title: o.name,
                     file: null,
                     artist: o.ar && o.ar.map((a: any) => a.name).join('，'),
                     album: o.al && o.al.name,
                     artwork: this.getFiles(albumUrl),
+                    webUrl: this.getWebUrl(songId),
                     length: songLength,
                     bitrate
                 }
@@ -422,6 +426,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         } else {
             throw new Error('NeteaseCloudMusicProvider searchUsers: ret code not 200')
         }
+    }
+
+    public getWebUrl(songId: string): string {
+        return `http://music.163.com/song?id=${songId}`
     }
 }
 
