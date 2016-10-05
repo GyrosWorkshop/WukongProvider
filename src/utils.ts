@@ -16,7 +16,7 @@ export function guessFromSongListUrl(link: string): SiteSongList {
 }
 
 function guessFromSongListNetease(url: Url.Url): string {
-    const matches = [/playlist\/?$/, /toplist\/?$/]
+    const matches = [/playlist\/?/, /toplist\/?$/]
     if (!_.some(matches, it => it.test(url.pathname))) {
         const link = url.hash.replace(/^#/, '')
         url = Url.parse(link)
@@ -24,8 +24,9 @@ function guessFromSongListNetease(url: Url.Url): string {
 
     const id = qs.parse(url.query).id
     const pathname = url.pathname
-    if (id && _.some(matches, it => it.test(pathname))) {
-        return qs.parse(url.query).id
+    const parseIdFromPath = (s: string) => s.split('/')[2];
+    if (_.some(matches, it => it.test(pathname))) {
+        return id || parseIdFromPath(pathname);
     }
     throw new Error('netease songlist parse failed')
 }
