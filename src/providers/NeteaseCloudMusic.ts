@@ -324,6 +324,9 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         } else {
             song.artwork = this.getFiles(song.artwork.file)
         }
+        if (Number(song.mvId)) {
+            song.mvWebUrl = `http://music.163.com/mv?id=${song.mvId}`
+        }
         return song
     }
 

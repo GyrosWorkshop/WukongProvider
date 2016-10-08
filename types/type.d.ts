@@ -19,6 +19,7 @@ declare namespace Wukong {
         bitrate?: number
         lyrics?: ILyric[]
         mvId?: string
+        mvWebUrl?: string
         mv?: IFiles
     }
     export interface IFiles {
