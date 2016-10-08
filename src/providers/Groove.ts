@@ -77,6 +77,10 @@ export default class GrooveProvider extends BaseProvider {
         }
     }
 
+    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+        return null
+    }
+
     private async mapToISong(data: any): Promise<Wukong.ISong> {
         const song = {} as Wukong.ISong
         song.length = 30

@@ -102,6 +102,7 @@ class Controller {
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
             song.music = await provider.getPlayingUrl(songId)
+            if (Number(song.mvId)) song.mv = await provider.getMvUrl(song.mvId)
         }
         return song
     }

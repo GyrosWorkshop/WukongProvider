@@ -18,6 +18,8 @@ declare namespace Wukong {
         // bitrate: number like 96000 (represents 96kpbs), 192000, 320000, etc.
         bitrate?: number
         lyrics?: ILyric[]
+        mvId?: string
+        mv?: IFiles
     }
     export interface IFiles {
         file: string

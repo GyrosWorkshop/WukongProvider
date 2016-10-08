@@ -102,6 +102,7 @@ abstract class BaseMusicProvider {
     abstract async searchSongs(searchKey: string): Promise<Array<Wukong.ISong>>
     abstract async getSongInfo(songId: string): Promise<Wukong.ISong>
     abstract async getPlayingUrl(songId: string): Promise<Wukong.IFiles>
+    abstract async getMvUrl(mvId: string): Promise<Wukong.IFiles>
     abstract async getSongList(songListId: string): Promise<Wukong.ISongList>
     abstract async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]>
     abstract async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]>

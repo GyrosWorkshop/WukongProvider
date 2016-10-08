@@ -53,6 +53,7 @@ export const Song = sequelize.define('song', {
     length: Sequelize.INTEGER,
     bitrate: Sequelize.INTEGER,
     meta: Sequelize.TEXT,
+    mvId: Sequelize.STRING,
     detail: Sequelize.BOOLEAN
 }, {
     indexes: [

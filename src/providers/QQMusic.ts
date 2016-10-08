@@ -202,6 +202,10 @@ export default class QQMusicProvider extends BaseProvider {
         }
     }
 
+    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+        return null
+    }
+
     public getWebUrl(songId: string): string {
         return `http://y.qq.com/portal/song/${songId}.html`
     }

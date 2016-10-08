@@ -5,3 +5,4 @@ server-config.json
 npm-debug.log
 *.swp
 .vscode/.browse.VC.db*
+storage/*.db

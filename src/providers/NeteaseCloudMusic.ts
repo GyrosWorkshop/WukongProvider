@@ -284,6 +284,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 },
                 form: body
             })
+            console.log(resObject.result.songs)
             let songList = this.convertToSongApiV2(resObject.result.songs, false)
             this.songSearchCache.set(key, songList)
             return songList
@@ -317,6 +318,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 console.error(err)
             }
             Object.assign(song, { detail: true })
+            song.mvId = resObject.songs[0].mv.toString()
             await this.save(song)
             if (!song) return null
         } else {
@@ -340,6 +342,20 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             form: body
         })
         return this.getFiles(resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString())
+    }
+
+    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+        let resObject = await this.sendRequest({
+            uri: `${NeteaseCloudMusicProvider.apiPrefix}/api/mv/detail/`,
+            qs: {
+                id: mvId,
+                type: 'mp4'
+            }
+        })
+        const videoes = resObject.data.brs
+        return {
+            file: videoes['1080'] || videoes['720'] || videoes['480'] || videoes['240'] || null
+        }
     }
 
     protected async sendRequest(options: Request.Options): Promise<any> {
