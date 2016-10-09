@@ -109,7 +109,7 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     private async searchSongsOnlne(token: string, key: string): Promise<Array<Wukong.ISong>> {
         const res: any = await this.sendRequest({
-            url: 'http://api.xiami.com/web?v=2.0&app_key=1&key=it%27s%20so%20easy&page=1&limit=50&_ksTS=1459930568781_153&callback=jsonp154&r=search/songs',
+            url: 'http://api.xiami.com/web',
             json: true,
             qs: {
                 key,
