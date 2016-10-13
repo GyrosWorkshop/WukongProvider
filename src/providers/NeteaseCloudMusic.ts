@@ -373,7 +373,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             name: rawData.name,
             playCount: rawData.playCount,
             description: rawData.description,
-            createTime: moment(rawData.createTime).format('YYYY-MM-DD HH:mm:ss'),
+            createTime: (new Date(rawData.createTime)).toISOString(),
             cover: this.getImageUrl(rawData.coverImgId),
             songs: withSongs ? this.convertToSongApiV2(rawData.tracks) : null,
             songCount: rawData.trackCount
