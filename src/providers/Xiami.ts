@@ -188,7 +188,7 @@ export default class XiamiMusicProvider extends BaseProvider {
             name: res.data.collect_name,
             playCount: res.data.play_count,
             createTime: (new Date(res.data.gmt_create * 1000)).toISOString(),
-            cover: res.data.logo,
+            cover: res.data.logo.replace('1.jpg', '4.jpg'),
             songCount: res.data.songs_count,
             songs: this.mapToSongs(res.data.songs)
         }
