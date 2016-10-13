@@ -21,6 +21,9 @@ app.use(bodyParser.json())
 if (serverConfig.trust_proxy)
     app.set('trust proxy', serverConfig.trust_proxy)
 app.use(morgan('combined'))
+app.use((req, res, next) => {
+    res.set('X-Wukong-Provider-Version', version)
+})
 http.createServer(app).listen(process.env.port || 3120)
 
 const providers = new Map<string, BaseMusicProvider>()
