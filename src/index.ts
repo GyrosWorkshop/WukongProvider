@@ -23,6 +23,7 @@ if (serverConfig.trust_proxy)
 app.use(morgan('combined'))
 app.use((req, res, next) => {
     res.set('X-Wukong-Provider-Version', version)
+    next()
 })
 http.createServer(app).listen(process.env.port || 3120)
 
