@@ -127,11 +127,15 @@ export default class XiamiMusicProvider extends BaseProvider {
             }
         })
         if (!res || res.state) return []
-        return res.data.songs.map((it: any) => {
+        return this.mapToSongs(res.data.songs)
+    }
+
+    private mapToSongs(rawArray: any[]): Wukong.ISong[] {
+        return rawArray.map((it: any) => {
             it.album_logo = it.album_logo.replace('1.jpg', '4.jpg')     // high resolution
             return {
-                songId: it.song_id,
                 siteId: this.providerName,
+                songId: it.song_id.toString(),
                 title: it.song_name,
                 album: it.album_name,
                 artist: it.artist_name,
@@ -139,9 +143,9 @@ export default class XiamiMusicProvider extends BaseProvider {
                     file: it.album_logo
                 },
                 webUrl: this.getWebUrl(it.song_id),
-                bitrate: 128000,
-                length: 0.0
-            } as Wukong.ISong
+                length: it.length * 1000,
+                bitrate: null
+            }
         })
     }
 
@@ -159,11 +163,10 @@ export default class XiamiMusicProvider extends BaseProvider {
         return `http://www.xiami.com/song/${songId}`
     }
 
-    // TODO
     public async getSongList(songListId: string): Promise<Wukong.ISongList> {
         // Xiami Collection, 虾米个人精选集
         const token = await this.getXiamiToken()
-        const res = await this.sendRequest({
+        const res = JSON.parse(await this.sendRequest({
             url: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
             qs: {
                 id: songListId,
@@ -175,12 +178,29 @@ export default class XiamiMusicProvider extends BaseProvider {
                 'Proxy-Connection': 'keep-alive',
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-FORWARDED-FOR': '42.156.140.237',
-                'CLIENT-IP': '42.156.140.237',
-                'Cookie': '_xiamitoken=' + token
+                'CLIENT-IP': '42.156.140.237'
             }
-        })
-        console.log(res)
-        return null
+        }))
+        return {
+            siteId: this.providerName,
+            songListId: res.data.list_id.toString().toString(),
+            creator: this.mapToThirdPartyUser(res.data),
+            name: res.data.collect_name,
+            playCount: res.data.play_count,
+            createTime: (new Date(res.data.gmt_create * 1000)).toISOString(),
+            cover: res.data.logo,
+            songCount: res.data.songs_count,
+            songs: this.mapToSongs(res.data.songs)
+        }
+    }
+
+    private mapToThirdPartyUser(rawData: any): Wukong.IThirdPartyUser {
+        return {
+            siteId: this.providerName,
+            userId: rawData.user_id.toString(),
+            name: rawData.user_name,
+            avatar: rawData.author_avatar.replace('1.jpg', '3.jpg')  // user avatar highest solution: 3
+        }
     }
 
     // TODO
