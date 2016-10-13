@@ -12,6 +12,8 @@ import * as http from 'http'
 import * as bodyParser from 'body-parser'
 import * as rp from 'request-promise'
 import {autobind} from 'core-decorators'
+
+const version = require('../package.json').version
 const serverConfig = require('../server-config.json')
 const app = express()
 
@@ -227,6 +229,6 @@ class Controller {
 
 new Controller(app)
 
-console.log('wukong provider started.')
+console.log(`wukong provider ${version} started. `)
 
 module.exports = app
