@@ -44,6 +44,9 @@ function guessFromSongListXiami(url: Url.Url): string {
     if (/collect\/\d+/.test(url.pathname)) {
         return /collect\/(\d+)/.exec(url.pathname)[1]
     }
+    if (/showcollect\/id\/\d+/.test(url.pathname)) {
+        return /showcollect\/id\/(\d+)/.exec(url.pathname)[1]
+    }
     throw new Error('xiami songlist parse failed')
 }
 
