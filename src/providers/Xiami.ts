@@ -169,8 +169,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         const res = JSON.parse(await this.sendRequest({
             url: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
             qs: {
-                id: songListId,
-                //'_xiamitoken': token
+                id: songListId
             },
             headers: {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_1 like Mac OS X) AppleWebKit/600.1.23 (KHTML, like Gecko) Version/12.0 Mobile/23D549 Safari/16182.331',
