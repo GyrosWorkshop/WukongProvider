@@ -160,7 +160,28 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     // TODO
-    public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
+    public async getSongList(songListId: string): Promise<Wukong.ISongList> {
+        // Xiami Collection, 虾米个人精选集
+        const token = await this.getXiamiToken()
+        const res = await this.sendRequest({
+            url: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
+            qs: {
+                id: songListId,
+                '_xiamitoken': token
+            },
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_1 like Mac OS X) AppleWebKit/600.1.23 (KHTML, like Gecko) Version/12.0 Mobile/23D549 Safari/16182.331',
+                'Referer': 'http://m.xiami.com/',
+                'Proxy-Connection': 'keep-alive',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-FORWARDED-FOR': '42.156.140.237',
+                'CLIENT-IP': '42.156.140.237',
+                'Cookie': '_xiamitoken=' + token
+            }
+        })
+        console.log(res)
+        return null
+    }
 
     // TODO
     public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> { return null }
