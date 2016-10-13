@@ -153,7 +153,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         const jar = Request.jar()
         const res = await this.sendRequest({
             url: 'http://www.xiami.com/web/login',
-            jar: jar
+            jar
         })
         const cookies = jar.getCookieString('http://xiami.com').split('=')[1]
         return cookies
@@ -170,7 +170,7 @@ export default class XiamiMusicProvider extends BaseProvider {
             url: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
             qs: {
                 id: songListId,
-                '_xiamitoken': token
+                //'_xiamitoken': token
             },
             headers: {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_1 like Mac OS X) AppleWebKit/600.1.23 (KHTML, like Gecko) Version/12.0 Mobile/23D549 Safari/16182.331',
@@ -178,9 +178,13 @@ export default class XiamiMusicProvider extends BaseProvider {
                 'Proxy-Connection': 'keep-alive',
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-FORWARDED-FOR': '42.156.140.237',
-                'CLIENT-IP': '42.156.140.237'
+                'CLIENT-IP': '42.156.140.237',
+                'Cookie': `_xiamitoken=${token}`
             }
         }))
+        if (res.state !== 0) {
+            throw new Error('Xiami getSongList failed: ' + res.state + ', ' + res.message + ', request_id=' + res.request_id)
+        }
         return {
             siteId: this.providerName,
             songListId: res.data.list_id.toString().toString(),
