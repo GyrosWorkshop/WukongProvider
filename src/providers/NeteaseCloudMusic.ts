@@ -110,7 +110,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         this.RequestOptions.headers['Referer'] = 'http://music.163.com/'
         this.RequestOptions.headers['Origin'] = 'http://music.163.com'
         if (serverConfig.useCookie) {
-            this.RequestOptions.headers['Cookie'] = serverConfig.useCookie
+            this.RequestOptions.headers['Cookie'] = serverConfig.useCookie['NeteaseCloudMusic']
         }
         this.RequestOptions.method = 'POST'
     }
