@@ -127,7 +127,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return rawArray.map((o: any) => {
             let albumUrl = o.album && o.album.picUrl,
                 albumPicId = o.album && o.album.picId
-            if (albumPicId) {
+            if (albumPicId !== '0') {
                 albumUrl = this.getImageUrl(albumPicId)
             }
             let musicUrl = o.mp3Url
@@ -152,7 +152,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 file: musicUrl,
                 artist: o.artists && o.artists.map((a: any) => a.name).join('，'),
                 album: o.album && o.album.name,
-                artwork: this.getFiles(albumUrl),
+                artwork: albumUrl ? this.getFiles(albumUrl) : null,
                 webUrl: this.getWebUrl(songId),
                 length: songLength,
                 bitrate
@@ -164,7 +164,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return rawArray.map((o: any) => {
             let albumUrl = o.al && o.al.picUrl,
                 albumPicId = o.al && o.al.pic_str
-            if (albumPicId) {
+            if (albumPicId !== '0') {
                 albumUrl = this.getImageUrl(albumPicId)
             }
             let musicUrl: string
@@ -192,7 +192,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                     file: null,
                     artist: o.ar && o.ar.map((a: any) => a.name).join('，'),
                     album: o.al && o.al.name,
-                    artwork: this.getFiles(albumUrl),
+                    artwork: albumUrl ? this.getFiles(albumUrl) : null,
                     webUrl: this.getWebUrl(songId),
                     length: songLength,
                     bitrate
