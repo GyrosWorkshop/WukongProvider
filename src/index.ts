@@ -86,16 +86,18 @@ class Controller {
      * @apiParam {string} siteId
      * @apiParam {string} songId
      * @apiParam {Boolean} [withFileUrl=false]
+     * @apiParam {Boolean} [withMvUrl=false]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songInfo(req: express.Request) {
-        const {siteId, songId, withFileUrl = false} = req.body as {
+        const {siteId, songId, withFileUrl = false, withMvUrl = false} = req.body as {
             siteId: string,
             songId: string,
-            withFileUrl: boolean
+            withFileUrl: boolean,
+            withMvUrl: boolean
         }
         if (!siteId || !songId) {
             throw new Error('IllegalArgumentException siteId or songId is not valid.')
@@ -108,7 +110,9 @@ class Controller {
         const song = await provider.getSongInfo(songId)
         if (withFileUrl) {
             song.music = await provider.getPlayingUrl(songId)
-            if (Number(song.mvId)) song.mv = await provider.getMvUrl(song.mvId)
+        }
+        if (withMvUrl && Number(song.mvId)) {
+            song.mv = await provider.getMvUrl(song.mvId)
         }
         return song
     }

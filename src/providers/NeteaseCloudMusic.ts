@@ -6,6 +6,7 @@ import BaseMusicProvider from './Base'
 const moment = require('moment-timezone')
 const serverConfig = require('../../server-config.json')
 const bigint = require('BigInt')
+const NodeCache = require('node-cache')
 
 moment.tz.setDefault('Asia/Shanghai')
 
@@ -104,6 +105,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     private songSearchCache: Map<string, Wukong.ISong[]> = new Map()
+    private musicFileUrlCache = new NodeCache({ stdTTL: 300, checkperiod: 60 })
 
     constructor() {
         super()
@@ -334,6 +336,12 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     public async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
+        let result = this.musicFileUrlCache.get(songId) as Wukong.IFiles
+        if (result) {
+            console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, result)
+            return result
+        }
+
         const song = await this.getSongInfo(songId)
         let body = NeteaseCloudMusicProvider.encryptRequest({
             ids: [songId],
@@ -347,7 +355,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             },
             form: body
         })
-        return this.getFiles(resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString())
+
+        result = this.getFiles(resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString()) as Wukong.IFiles
+        this.musicFileUrlCache.set(songId, result)
+        return result
     }
 
     public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
