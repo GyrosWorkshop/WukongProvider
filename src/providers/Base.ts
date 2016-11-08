@@ -36,7 +36,7 @@ abstract class BaseMusicProvider {
      */
     protected async save(song: Wukong.ISong & {meta?: string, detail?: boolean}): Promise<void> {
         const saveSong: Wukong.ISong = _.cloneDeep(song)
-        if (!_.isString(saveSong.artwork)) saveSong.artwork = (<any>saveSong.artwork).file
+        if (saveSong.artwork && !_.isString(saveSong.artwork)) saveSong.artwork = (<any>saveSong.artwork).file
         let dbSong = await Song.findOne({
             where: {
                 songId: saveSong.songId,
