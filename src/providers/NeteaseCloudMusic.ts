@@ -208,7 +208,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     private getFiles(url: string | null): Wukong.IFiles {
         return url ? {
             file: url,
-            fileViaCdn: url.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + '&cachecdn=1'
+            fileViaCdn: url.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + (url.indexOf('?') === -1 ? '?' : '&') + 'cachecdn=1'
         } : null
     }
 
