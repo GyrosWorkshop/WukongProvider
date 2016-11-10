@@ -105,7 +105,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     private songSearchCache: Map<string, Wukong.ISong[]> = new Map()
-    private musicFileUrlCache = new NodeCache({ stdTTL: 300, checkperiod: 60 })
+    private musicFileUrlCache = new NodeCache({ stdTTL: 1800, checkperiod: 60 })
 
     constructor() {
         super()
