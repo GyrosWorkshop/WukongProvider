@@ -205,11 +205,11 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }).filter((o) => <any>o)
     }
 
-    private getFiles(url: string): Wukong.IFiles {
-        return {
+    private getFiles(url: string | null): Wukong.IFiles {
+        return url ? {
             file: url,
             fileViaCdn: url.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + '&cachecdn=1'
-        }
+        } : null
     }
 
     private convertLyric(rawData: any, translate: boolean, withTimeline: boolean): Wukong.ILyric {
@@ -355,9 +355,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             },
             form: body
         })
-
-        result = this.getFiles(resObject.data[0].url + '?semi_expi=' + resObject.data[0].expi.toString()) as Wukong.IFiles
-        this.musicFileUrlCache.set(songId, result)
+        console.log(resObject.data[0])
+        const url = resObject.data[0].url
+        result = this.getFiles(url) as Wukong.IFiles
+        if (result) this.musicFileUrlCache.set(songId, result)
         return result
     }
 
