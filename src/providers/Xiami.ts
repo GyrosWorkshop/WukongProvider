@@ -2,6 +2,7 @@ import BaseProvider, {Request} from './Base'
 import {autobind} from 'core-decorators'
 import * as _ from 'lodash'
 import {AllHtmlEntities} from 'html-entities'
+const serverConfig = require('../../server-config.json')
 
 @autobind
 export default class XiamiMusicProvider extends BaseProvider {
@@ -10,10 +11,15 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     private entities: AllHtmlEntities
+    private sessionCookie: string = ''
 
     constructor() {
         super()
         this.entities = new AllHtmlEntities()
+        if (serverConfig.useCookie && _.isString(serverConfig.useCookie.Xiami)) {
+            this.sessionCookie = serverConfig.useCookie['Xiami'].replace(/_xiamitoken=\w+; /ig, '') // remove redundant xiamitoken property
+            this.RequestOptions.headers['Cookie'] = this.sessionCookie
+        }
     }
 
     async getSongInfo(songId: string): Promise<Wukong.ISong> {
@@ -178,7 +184,7 @@ export default class XiamiMusicProvider extends BaseProvider {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-FORWARDED-FOR': '42.156.140.237',
                 'CLIENT-IP': '42.156.140.237',
-                'Cookie': `_xiamitoken=${token}`
+                'Cookie': `_xiamitoken=${token}; ${this.sessionCookie}`
             }
         }))
         if (res.state !== 0) {
