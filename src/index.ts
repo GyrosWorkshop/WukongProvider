@@ -53,6 +53,7 @@ class Controller {
      * @apiGroup API
      * @apiDescription To simplify our provider implementation, only title, artist, and album are ensured to be included in the result.
      * @apiParam {string} key search keyword
+     * @apiParam {string} [withCookie]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      [
@@ -67,11 +68,12 @@ class Controller {
      */
     async searchSongs(req: express.Request) {
         const key = req.body.key
+        const withCookie = req.body.withCookie
         if (!_.isString(key) || _.isEmpty(key)) {
             throw new Error('IllegalArgumentException "key" not exist or wrong type.')
         }
         console.log('Request searchSongs', key)
-        const result = await Promise.all<Wukong.ISong[]>([...providers].map(([, it]) => it.searchSongs(key)))
+        const result = await Promise.all<Wukong.ISong[]>([...providers].map(([, it]) => it.searchSongs(key, withCookie)))
         const data = _.uniqBy(
             Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it),
             (it: Wukong.ISong) => `${it.siteId}|${it.songId}`
@@ -87,17 +89,19 @@ class Controller {
      * @apiParam {string} songId
      * @apiParam {Boolean} [withFileUrl=false]
      * @apiParam {Boolean} [withMvUrl=false]
+     * @apiParam {string} [withCookie]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songInfo(req: express.Request) {
-        const {siteId, songId, withFileUrl = false, withMvUrl = false} = req.body as {
-            siteId: string,
-            songId: string,
-            withFileUrl: boolean,
+        const {siteId, songId, withFileUrl = false, withMvUrl = false, withCookie} = req.body as {
+            siteId: string
+            songId: string
+            withFileUrl: boolean
             withMvUrl: boolean
+            withCookie: string
         }
         if (!siteId || !songId) {
             throw new Error('IllegalArgumentException siteId or songId is not valid.')
@@ -107,9 +111,9 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         console.log('Request songInfo', req.body)
-        const song = await provider.getSongInfo(songId)
+        const song = await provider.getSongInfo(songId, withCookie)
         if (withFileUrl) {
-            song.music = await provider.getPlayingUrl(songId)
+            song.music = await provider.getPlayingUrl(songId, withCookie)
         }
         if (withMvUrl && Number(song.mvId)) {
             song.mv = await provider.getMvUrl(song.mvId)
@@ -123,15 +127,17 @@ class Controller {
      * @apiGroup API
      * @apiParam {string} siteId
      * @apiParam {string} songListId
+     * @apiParam {string} [withCookie]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songList(req: express.Request) {
-        const {siteId, songListId} = req.body as {
+        const {siteId, songListId, withCookie} = req.body as {
             siteId: string
             songListId: string
+            withCookie: string
         }
         if (!siteId || !songListId) {
             throw new Error('IllegalArgumentException siteId or songListId is empty')
@@ -141,7 +147,7 @@ class Controller {
         if (!provider) {
             throw new Error('site provider not exist.')
         }
-        return provider.getSongList(songListId)
+        return provider.getSongList(songListId, withCookie)
     }
 
     /**
@@ -149,14 +155,16 @@ class Controller {
      * @apiName songListWithUrl
      * @apiGroup API
      * @apiParam {string} url
+     * @apiParam {string} [withCookie]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songListWithUrl(req: express.Request) {
-        const {url} = req.body as {
+        const {url, withCookie} = req.body as {
             url: string
+            withCookie: string
         }
         const songList = guessFromSongListUrl(url)
         if (!songList) {
@@ -167,7 +175,7 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         console.log('Request songListWithUrl', url)
-        return provider.getSongList(songList.songListId)
+        return provider.getSongList(songList.songListId, withCookie)
     }
 
     /**
@@ -176,15 +184,17 @@ class Controller {
      * @apiGroup API
      * @apiParam {string} siteId
      * @apiParam {string} thirdPartyUserId
+     * @apiParam {string} [withCookie]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async userSongLists(req: express.Request) {
-        const {siteId, thirdPartyUserId} = req.body as {
-            siteId: string,
+        const {siteId, thirdPartyUserId, withCookie} = req.body as {
+            siteId: string
             thirdPartyUserId: string
+            withCookie: string
         }
         if (!siteId || !thirdPartyUserId) {
             throw new Error('IllegalArgumentException siteId or thirdPartyUserId is empty')
@@ -194,7 +204,7 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         console.log('Request userSongLists', req.body)
-        return provider.getUserSongLists(thirdPartyUserId)
+        return provider.getUserSongLists(thirdPartyUserId, withCookie)
     }
 
     /**
@@ -202,20 +212,22 @@ class Controller {
      * @apiName searchUsers
      * @apiGroup API
      * @apiParam {string} key
+     * @apiParam {string} [withCookie]
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async searchUsers(req: express.Request) {
-        const {key} = req.body as {
+        const {key, withCookie} = req.body as {
             key: string
+            withCookie: string
         }
         if (!_.isString(key) || _.isEmpty(key)) {
             throw new Error('IllegalArgumentException key not exist or wrong type.')
         }
         console.log('Request searchUsers', key)
-        const result = await Promise.all<Wukong.IThirdPartyUser[]>([...providers].map(([, it]) => it.searchUsers(key)))
+        const result = await Promise.all<Wukong.IThirdPartyUser[]>([...providers].map(([, it]) => it.searchUsers(key, withCookie)))
         const data = Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it)
         return data
     }

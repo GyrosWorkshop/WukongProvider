@@ -6,7 +6,7 @@ describe('NeteaseCloudMusicProvider', () => {
     const provider = new NeteaseCloudMusicProvider()
     describe('search', () => {
         it('不为谁而作的歌 search results', async () => {
-            const songs = await provider.searchSongs('不为谁而作的歌', 0, 30)
+            const songs = await provider.searchSongs('不为谁而作的歌')
             for (let song of songs) {
                 assert.equal(song.siteId, 'netease-cloud-music')
             }

@@ -22,10 +22,20 @@ export default class XiamiMusicProvider extends BaseProvider {
         }
     }
 
-    async getSongInfo(songId: string): Promise<Wukong.ISong> {
+    private getCookieHeader(cookie: string): any {
+        if (cookie && _.isString(cookie)) {
+            const validCookieMatch = /member_auth=[^;]+/.exec(cookie)
+            if (validCookieMatch) return {
+                Cookie: String(validCookieMatch)
+            }
+        }
+        return {}
+    }
+
+    async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
         let song: Wukong.ISong = await this.load(songId, true)
-        if (!song) {
-            song = await this.getSongInfoOnline(songId)
+        if (!song || withCookie) {
+            song = await this.getSongInfoOnline(songId, withCookie)
             if (!song) {
                 throw new Error('获取歌曲信息失败')
             }
@@ -34,11 +44,14 @@ export default class XiamiMusicProvider extends BaseProvider {
         return _.omit(song, ['meta', 'detail']) as Wukong.ISong
     }
 
-    private async getSongInfoOnline(songId: string): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
+    private async getSongInfoOnline(songId: string, withCookie?: string): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
         if (!songId) return null
+        const headers = this.getCookieHeader(withCookie)
+        const url = `http://www.xiami.com/song/playlist/id/${songId}/object_name/default/object_id/0/cat/json`
         const res = await this.sendRequest({
-            url: `http://www.xiami.com/song/playlist/id/${songId}/object_name/default/object_id/0/cat/json`,
-            json: true
+            url,
+            json: true,
+            headers
         })
         if (!res.status || _.isNull(res.data.trackList)) {
             throw new Error('XiamiProvider: 获取错误-' + res.message)
@@ -81,7 +94,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         return decodeURIComponent(ans.join('')).replace(/\^/g, '0')// replace('//m5', '//m6').replace('l.mp3', 'h.mp3')
     }
 
-    async searchSongs(keywords: string, offset: number = 0, limit: number = 30): Promise<Array<Wukong.ISong>> {
+    async searchSongs(keywords: string, withCookie?: string): Promise<Array<Wukong.ISong>> {
         if (!keywords) return []
         const token = await this.getXiamiToken()
         const songs = await this.searchSongsOnlne(token, keywords)
@@ -102,7 +115,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         return null
     }
 
-    public async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
         const song = await this.load(songId, true) as Wukong.ISong & { meta: any }
         return {
             file: this.parsePlayingUrl(JSON.parse(song.meta).location)
@@ -169,9 +182,10 @@ export default class XiamiMusicProvider extends BaseProvider {
         return `http://www.xiami.com/song/${songId}`
     }
 
-    public async getSongList(songListId: string): Promise<Wukong.ISongList> {
+    public async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList> {
         // Xiami Collection, 虾米个人精选集
         const token = await this.getXiamiToken()
+
         const res = JSON.parse(await this.sendRequest({
             url: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
             qs: {
@@ -213,8 +227,8 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     // TODO
-    public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> { return null }
+    public async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]> { return null }
 
     // TODO
-    public async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]> { return null }
+    public async searchUsers(searchKey: string, withCookie?: string): Promise<Wukong.IThirdPartyUser[]> { return null }
 }

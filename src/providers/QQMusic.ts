@@ -55,7 +55,7 @@ export default class QQMusicProvider extends BaseProvider {
         }
     }
 
-    async getSongInfo(songId: string): Promise<Wukong.ISong> {
+    async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
         // Fixme: get music from baseinfo API.
         let song: Wukong.ISong = await this.load(songId, true)
         if (!song) {
@@ -66,7 +66,8 @@ export default class QQMusicProvider extends BaseProvider {
         return song
     }
 
-    async searchSongs(keywords: string, offset: number = 0, limit: number = 30): Promise<Array<Wukong.ISong>> {
+    async searchSongs(keywords: string, withCookie?: string): Promise<Array<Wukong.ISong>> {
+        const offset = 0, limit = 30
         const result = await this.sendRequest({
             url: 'http://s.music.qq.com/fcgi-bin/music_search_new_platform',
             qs: {
@@ -178,7 +179,7 @@ export default class QQMusicProvider extends BaseProvider {
         return 'http://y.gtimg.cn/music/photo_new/' + 'T002' + 'R300x300' + 'M000' + imgId + '.jpg' + '?max_age=2592000'
     }
 
-    public async getPlayingUrl(songId: string, overseas?: boolean, useCdn?: boolean): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
             url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
@@ -211,11 +212,11 @@ export default class QQMusicProvider extends BaseProvider {
     }
 
     // TODO
-    public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
+    public async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList> { return null }
 
     // TODO
-    public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> { return null }
+    public async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]> { return null }
 
     // TODO
-    public async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]> { return null }
+    public async searchUsers(searchKey: string, withCookie?: string): Promise<Wukong.IThirdPartyUser[]> { return null }
 }

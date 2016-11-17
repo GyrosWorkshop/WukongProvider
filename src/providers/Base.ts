@@ -98,14 +98,13 @@ abstract class BaseMusicProvider {
         return !!/\[\d+:\d+\.\d+\]/.exec(lyric)
     }
 
-    abstract async searchSongs(searchKey: string, offset: number, limit: number): Promise<Array<Wukong.ISong>>
-    abstract async searchSongs(searchKey: string): Promise<Array<Wukong.ISong>>
-    abstract async getSongInfo(songId: string): Promise<Wukong.ISong>
-    abstract async getPlayingUrl(songId: string): Promise<Wukong.IFiles>
+    abstract async searchSongs(searchKey: string, withCookie?: string): Promise<Array<Wukong.ISong>>
+    abstract async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong>
+    abstract async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles>
     abstract async getMvUrl(mvId: string): Promise<Wukong.IFiles>
-    abstract async getSongList(songListId: string): Promise<Wukong.ISongList>
-    abstract async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]>
-    abstract async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]>
+    abstract async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList>
+    abstract async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]>
+    abstract async searchUsers(searchKey: string, withCookie?: string): Promise<Wukong.IThirdPartyUser[]>
 
     abstract getWebUrl(songId: string): string
     private formatRow(song: Wukong.ISong | any): Wukong.ISong {

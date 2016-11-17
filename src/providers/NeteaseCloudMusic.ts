@@ -268,13 +268,25 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async searchSongs(searchKey: string, offset: number = 0, limit: number = 30): Promise<Wukong.ISong[]> {
+    private getCookieHeader(cookie: string): any {
+        if (cookie && _.isString(cookie)) {
+            const validCookieMatch = /MUSIC_U=[^;]+/.exec(cookie)
+            if (validCookieMatch) return {
+                Cookie: String(validCookieMatch)
+            }
+        }
+        return {}
+    }
+
+    public async searchSongs(searchKey: string, withCookie?: string): Promise<Wukong.ISong[]> {
         searchKey = searchKey.trim()
-        const key = `search-${searchKey}-offset-${offset}-limit-${limit}`
+        const offset = 0, limit = 30
+        const key = `search-${searchKey}-offset-${offset}-limit-${limit}-${withCookie}`
         if (this.songSearchCache.has(key)) {
             return this.songSearchCache.get(key)
         }
 
+        const headers = this.getCookieHeader(withCookie)
         try {
             let body = NeteaseCloudMusicProvider.encryptRequest({
                 s: searchKey,
@@ -287,7 +299,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 qs: {
                     csrf_token: ''
                 },
-                form: body
+                form: body,
+                headers
             })
             console.log(resObject.result.songs)
             let songList = this.convertToSongApiV2(resObject.result.songs, false)
@@ -300,10 +313,11 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async getSongInfo(songId: string): Promise<Wukong.ISong> {
+    public async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
         const key = `song-${songId}`
         let song: Wukong.ISong = await this.load(songId, true)
         if (!song) {
+            const headers = this.getCookieHeader(withCookie)
             let body = NeteaseCloudMusicProvider.encryptRequest({
                 id: songId,
                 c: JSON.stringify([{id: songId}]),
@@ -314,7 +328,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 qs: {
                     csrf_token: ''
                 },
-                form: body
+                form: body,
+                headers
             })
             song = this.convertToSongApiV2(resObject.songs, true)[0]
             try {
@@ -335,14 +350,15 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
         let result = this.musicFileUrlCache.get(songId) as Wukong.IFiles
         if (result) {
             console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, result)
             return result
         }
 
-        const song = await this.getSongInfo(songId)
+        const song = await this.getSongInfo(songId, withCookie)
+        const headers = this.getCookieHeader(withCookie)
         let body = NeteaseCloudMusicProvider.encryptRequest({
             ids: [songId],
             br: song.bitrate,
@@ -353,7 +369,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             qs: {
                 csrf_token: ''
             },
-            form: body
+            form: body,
+            headers
         })
         console.log(resObject.data[0])
         const url = resObject.data[0].url
@@ -398,7 +415,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async getSongList(songListId: string): Promise<Wukong.ISongList> {
+    public async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList> {
+        const headers = this.getCookieHeader(withCookie)
         const body = NeteaseCloudMusicProvider.encryptRequest({
             id: songListId.toString(),
             offset: '0',
@@ -412,7 +430,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             qs: {
                 csrf_token: ''
             },
-            form: body
+            form: body,
+            headers
         })
         if (resObject.code === 200) {
             return this.mapToSongList(resObject.playlist, true)
@@ -421,7 +440,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> {
+    public async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]> {
+        const headers = this.getCookieHeader(withCookie)
         const body = NeteaseCloudMusicProvider.encryptRequest({
             uid: thirdPartyUserId.toString(),
             offset: '0',
@@ -433,7 +453,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             qs: {
                 csrf_token: ''
             },
-            form: body
+            form: body,
+            headers
         })
         if (resObject.code === 200) {
             return resObject.playlist.map((it: any) => this.mapToSongList(it, false))
@@ -442,7 +463,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]> {
+    public async searchUsers(searchKey: string, withCookie?: string): Promise<Wukong.IThirdPartyUser[]> {
+        const headers = this.getCookieHeader(withCookie)
         const body = NeteaseCloudMusicProvider.encryptRequest({
             s: searchKey.toString(),
             type: '1002',
@@ -456,7 +478,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             qs: {
                 csrf_token: ''
             },
-            form: body
+            form: body,
+            headers
         })
         if (resObject.code === 200) {
             return resObject.result.userprofiles.map((it: any) => this.mapToThirdPartyUser(it))

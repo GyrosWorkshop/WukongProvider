@@ -31,7 +31,7 @@ export default class GrooveProvider extends BaseProvider {
         return JSON.parse(result).access_token
     }
 
-    async searchSongs(keywords: string, offset: number = 0, limit: number = 30): Promise<Array<Wukong.ISong>> {
+    async searchSongs(keywords: string, withCookie?: string): Promise<Array<Wukong.ISong>> {
         let accessToken = await this.getAccessToken()
         try {
             const result = await this.sendRequest({
@@ -53,7 +53,7 @@ export default class GrooveProvider extends BaseProvider {
         }
     }
 
-    async getSongInfo(songId: string): Promise<Wukong.ISong> {
+    async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
         let accessToken = await this.getAccessToken()
         const result = await this.sendRequest({
             url: `https://music.xboxlive.com/1/content/${songId}/lookup`,
@@ -64,7 +64,7 @@ export default class GrooveProvider extends BaseProvider {
         return this.mapToISong((JSON.parse(result).Tracks.Items as Array<any>)[0])
     }
 
-    async getPlayingUrl(songId: string): Promise<Wukong.IFiles> {
+    async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
         let accessToken = await this.getAccessToken()
         const result = await this.sendRequest({
             url: `https://music.xboxlive.com/1/content/${songId}/preview`,
@@ -99,13 +99,13 @@ export default class GrooveProvider extends BaseProvider {
     }
 
     // TODO
-    public async getSongList(songListId: string): Promise<Wukong.ISongList> { return null }
+    public async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList> { return null }
 
     // TODO
-    public async getUserSongLists(thirdPartyUserId: string): Promise<Wukong.ISongList[]> { return null }
+    public async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]> { return null }
 
     // TODO
-    public async searchUsers(searchKey: string): Promise<Wukong.IThirdPartyUser[]> { return null }
+    public async searchUsers(searchKey: string, withCookie?: string): Promise<Wukong.IThirdPartyUser[]> { return null }
 
     // TODO
     public getWebUrl(songId: string): string { return null }
