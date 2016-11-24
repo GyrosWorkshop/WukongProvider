@@ -302,7 +302,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 form: body,
                 headers
             })
-            console.log(resObject.result.songs)
             let songList = this.convertToSongApiV2(resObject.result.songs, false)
             this.songSearchCache.set(key, songList)
             return songList
@@ -372,7 +371,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             form: body,
             headers
         })
-        console.log(resObject.data[0])
         const url = resObject.data[0].url
         result = this.getFiles(url) as Wukong.IFiles
         if (result) {
