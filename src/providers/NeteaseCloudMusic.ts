@@ -354,7 +354,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
         let result = this.musicFileUrlCache.get(songId) as Wukong.IFiles
         if (result) {
             console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, result)
@@ -380,48 +380,12 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         result = this.getFiles(url) as Wukong.IFiles
         if (result) {
             this.musicFileUrlCache.set(songId, result)
-
-            // add netease-cloud-music play log (for count) when with valid cookie
-            if (headers.Cookie && sendPlayLog) {
-                this.sendPlayLog(songId, headers)
-            }
         } else {
             result = {
                 file: 'https://oh55fiz85.qnssl.com/avstatic/unavailable.mp3?unavailable'
             }
         }
         return result
-    }
-
-    private async sendPlayLog(songId: string, headers: any) {
-        try {
-            let body = NeteaseCloudMusicProvider.encryptRequest({
-                logs: JSON.stringify([{
-                    action: 'play',
-                    json: {
-                        id: songId,
-                        type: 'song'
-                    }
-                }]),
-                csrf_token: ''
-            })
-            let resObject = await this.sendRequest({
-                uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/feedback/weblog`,
-                qs: {
-                    csrf_token: ''
-                },
-                form: body,
-                headers
-            })
-            if (resObject && resObject.code === 200) {
-                console.log('sendPlayLog is finished for: ' + (await this.getUserInfo(headers)).name)
-                return
-            } else {
-                console.error('sendPlayLog unknown return: ', JSON.stringify(resObject))
-            }
-        } catch (e) {
-            console.error('sendPlayLog error: ', e)
-        }
     }
 
     public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {

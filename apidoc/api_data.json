@@ -15,6 +15,13 @@
             "optional": false,
             "field": "key",
             "description": "<p>search keyword</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "withCookie",
+            "description": ""
           }
         ]
       }
@@ -55,6 +62,13 @@
             "type": "string",
             "optional": false,
             "field": "key",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "withCookie",
             "description": ""
           }
         ]
@@ -106,10 +120,18 @@
           },
           {
             "group": "Parameter",
+            "type": "Boolean",
+            "optional": true,
+            "field": "withMvUrl",
+            "defaultValue": "false",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
             "type": "string",
             "optional": true,
-            "field": "clientIP",
-            "description": "<p>If provided with this, server may take different actions to the file url. E.g. use proxy server to make oversea users happy.</p>"
+            "field": "withCookie",
+            "description": ""
           }
         ]
       }
@@ -140,14 +162,21 @@
             "group": "Parameter",
             "type": "string",
             "optional": false,
-            "field": "songListId",
+            "field": "siteId",
             "description": ""
           },
           {
             "group": "Parameter",
             "type": "string",
             "optional": false,
-            "field": "siteId",
+            "field": "songListId",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "withCookie",
             "description": ""
           }
         ]
@@ -180,6 +209,13 @@
             "type": "string",
             "optional": false,
             "field": "url",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "withCookie",
             "description": ""
           }
         ]
@@ -219,6 +255,13 @@
             "type": "string",
             "optional": false,
             "field": "thirdPartyUserId",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "withCookie",
             "description": ""
           }
         ]

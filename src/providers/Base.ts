@@ -100,7 +100,7 @@ abstract class BaseMusicProvider {
 
     abstract async searchSongs(searchKey: string, withCookie?: string): Promise<Array<Wukong.ISong>>
     abstract async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong>
-    abstract async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFiles>
+    abstract async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles>
     abstract async getMvUrl(mvId: string): Promise<Wukong.IFiles>
     abstract async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList>
     abstract async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]>
