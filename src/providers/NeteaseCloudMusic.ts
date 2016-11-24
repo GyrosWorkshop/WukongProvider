@@ -375,11 +375,49 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         console.log(resObject.data[0])
         const url = resObject.data[0].url
         result = this.getFiles(url) as Wukong.IFiles
-        if (result) this.musicFileUrlCache.set(songId, result)
-        else result = {
-            file: 'https://oh55fiz85.qnssl.com/avstatic/unavailable.mp3?unavailable'
+        if (result) {
+            this.musicFileUrlCache.set(songId, result)
+
+            // add netease-cloud-music play log (for count) when with valid cookie
+            if (headers.Cookie) {
+                this.sendPlayLog(songId, headers)
+            }
+        } else {
+            result = {
+                file: 'https://oh55fiz85.qnssl.com/avstatic/unavailable.mp3?unavailable'
+            }
         }
         return result
+    }
+
+    private async sendPlayLog(songId: string, headers: any) {
+        try {
+            let body = NeteaseCloudMusicProvider.encryptRequest({
+                logs: JSON.stringify([{
+                    action: 'play',
+                    json: {
+                        id: songId,
+                        type: 'song'
+                    }
+                }]),
+                csrf_token: ''
+            })
+            let resObject = await this.sendRequest({
+                uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/feedback/weblog`,
+                qs: {
+                    csrf_token: ''
+                },
+                form: body,
+                headers
+            })
+            if (resObject && resObject.code === 200) {
+                return
+            } else {
+                console.error('sendPlayLog unknown return: ', JSON.stringify(resObject))
+            }
+        } catch (e) {
+            console.error('sendPlayLog error: ', e)
+        }
     }
 
     public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
