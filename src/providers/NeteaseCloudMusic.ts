@@ -377,7 +377,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         result = this.getFiles(url) as Wukong.IFiles
         if (result) this.musicFileUrlCache.set(songId, result)
         else result = {
-            file: 'http://cdn.qn.hb-sem.senorsen.com/avstatic/unavailable.mp3?unavailable'
+            file: 'https://oh55fiz85.qnssl.com/avstatic/unavailable.mp3?unavailable'
         }
         return result
     }
