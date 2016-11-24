@@ -268,11 +268,15 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    private getCookieHeader(cookie: string): any {
-        if (cookie && _.isString(cookie)) {
-            const validCookieMatch = /MUSIC_U=[^;]+/.exec(cookie)
-            if (validCookieMatch) return {
-                Cookie: String(validCookieMatch)
+    private getCookieHeader(cookie: string | any): any {
+        if (cookie) {
+            if (_.isString(cookie)) {
+                const validCookieMatch = /MUSIC_U=[^;]+/.exec(cookie)
+                if (validCookieMatch) return {
+                    Cookie: String(validCookieMatch)
+                }
+            } else if (cookie.Cookie) {
+                return cookie
             }
         }
         return {}
@@ -350,7 +354,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFiles> {
         let result = this.musicFileUrlCache.get(songId) as Wukong.IFiles
         if (result) {
             console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, result)
@@ -378,7 +382,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             this.musicFileUrlCache.set(songId, result)
 
             // add netease-cloud-music play log (for count) when with valid cookie
-            if (headers.Cookie) {
+            if (headers.Cookie && sendPlayLog) {
                 this.sendPlayLog(songId, headers)
             }
         } else {
@@ -410,6 +414,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 headers
             })
             if (resObject && resObject.code === 200) {
+                console.log('sendPlayLog is finished for: ' + (await this.getUserInfo(headers)).name)
                 return
             } else {
                 console.error('sendPlayLog unknown return: ', JSON.stringify(resObject))
@@ -434,7 +439,21 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     protected async sendRequest(options: Request.Options): Promise<any> {
-        return JSON.parse(await super.sendRequest(options))
+        const ret = await super.sendRequest(options)
+        try {
+            return JSON.parse(ret)
+        } catch (e) {
+            if (e instanceof SyntaxError) {
+                // String instead of JSON
+                return ret
+            } else {
+                throw e
+            }
+        }
+    }
+
+    private async getPage(options: Request.Options): Promise<String> {
+        return await super.sendRequest(options)
     }
 
     private mapToSongList(rawData: any, withSongs: boolean = false): Wukong.ISongList {
@@ -477,7 +496,26 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]> {
+    public async getUserInfo(cookie: any): Promise<Wukong.IThirdPartyUser> {
+        const headers = this.getCookieHeader(cookie)
+        if (!headers.Cookie) return null
+        const body = NeteaseCloudMusicProvider.encryptRequest({
+            csrf_token: ''
+        })
+        const resObject = await this.sendRequest({
+            uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/v1/user/info`,
+            qs: {
+                csrf_token: ''
+            },
+            form: body,
+            headers
+        })
+        const userId = resObject.userPoint.userId
+
+        return (await this.getUserSongLists(userId, cookie))[0].creator
+    }
+
+    public async getUserSongLists(thirdPartyUserId?: string, withCookie?: string): Promise<Wukong.ISongList[]> {
         const headers = this.getCookieHeader(withCookie)
         const body = NeteaseCloudMusicProvider.encryptRequest({
             uid: thirdPartyUserId.toString(),
