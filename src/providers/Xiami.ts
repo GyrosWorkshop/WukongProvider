@@ -85,7 +85,8 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     private getApproriateAudio(audios: any[]): any {
-        return audios.reduce((acc: any, cur: any) => (acc.rate > cur.rate ? acc : cur))
+        return audios.filter(it => it.audioQualityEnum !== 'LOSSLESS')
+            .reduce((acc: any, cur: any) => (acc.rate > cur.rate ? acc : cur))
     }
 
     // https://gist.github.com/buoge/a3a0774e6e19a5c2ed820331ce4a08dd
