@@ -17,16 +17,19 @@ export default class XiamiMusicProvider extends BaseProvider {
         super()
         this.entities = new AllHtmlEntities()
         if (serverConfig.useCookie && _.isString(serverConfig.useCookie.Xiami)) {
-            this.sessionCookie = serverConfig.useCookie['Xiami'].replace(/_xiamitoken=\w+; /ig, '') // remove redundant xiamitoken property
-            this.RequestOptions.headers['Cookie'] = this.sessionCookie
+            this.sessionCookie = serverConfig.useCookie['Xiami']
         }
     }
 
-    private getCookieHeader(cookie: string): any {
-        if (cookie && _.isString(cookie)) {
-            const validCookieMatch = /member_auth=[^;]+/.exec(cookie)
-            if (validCookieMatch) return {
-                Cookie: String(validCookieMatch)
+    private getCookieHeader(cookie: string | any): any {
+        if (cookie) {
+            if (_.isString(cookie)) {
+                const validCookieMatch = /member_auth=[^;]+/.exec(cookie)
+                if (validCookieMatch) return {
+                    Cookie: String(validCookieMatch)
+                }
+            } else if (cookie.Cookie) {
+                return cookie
             }
         }
         return {}
@@ -34,8 +37,9 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
         let song: Wukong.ISong = await this.load(songId, true)
-        if (!song || withCookie) {
-            song = await this.getSongInfoOnline(songId, withCookie)
+        let headers = this.getCookieHeader(withCookie)
+        if (!song || headers.cookie) {
+            song = await this.getSongInfoOnline(songId, headers)
             if (!song) {
                 throw new Error('获取歌曲信息失败')
             }
@@ -44,9 +48,9 @@ export default class XiamiMusicProvider extends BaseProvider {
         return _.omit(song, ['meta', 'detail']) as Wukong.ISong
     }
 
-    private async getSongInfoOnline(songId: string, withCookie?: string): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
+    private async getSongInfoOnline(songId: string, cookie?: string | any): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
         if (!songId) return null
-        const headers = this.getCookieHeader(withCookie)
+        const headers = this.getCookieHeader(cookie)
         const url = `http://www.xiami.com/song/playlist/id/${songId}/object_name/default/object_id/0/cat/json`
         const res = await this.sendRequest({
             url,
@@ -67,31 +71,27 @@ export default class XiamiMusicProvider extends BaseProvider {
             file: onlineSong.album_pic
         }
         song.webUrl = this.getWebUrl(songId)
-        song.bitrate = 128000
         song.length = onlineSong.length * 1000
+        try {
+            const onlineSongAudio = this.getApproriateAudio(onlineSong.allAudios)
+            song.length = onlineSongAudio.length
+            song.bitrate = onlineSongAudio.rate * 1000
+        } catch (e) {
+            console.error('getSongInfoOnline: song bitrate parse failed', onlineSong)
+        }
         song.music = null
         song.lyrics = await this.getSongLyrics(onlineSong.lyric_url)
         return Object.assign(song, {meta: JSON.stringify(onlineSong), detail: true})
     }
 
+    private getApproriateAudio(audios: any[]): any {
+        return audios.reduce((acc: any, cur: any) => (acc.rate > cur.rate ? acc : cur))
+    }
+
     // https://gist.github.com/buoge/a3a0774e6e19a5c2ed820331ce4a08dd
-    private parsePlayingUrl(location: string): string {
-        const arr = location.split('')
-        const rows = parseInt(arr.shift())
-        const columns = Math.floor(arr.length / rows)
-        const rightRows = arr.length % rows
-        let iteration = 0
-        const ans: Array<string> = []
-        for (let i = 0; i !== arr.length; ++i) {
-            const x = i % rows
-            const y = Math.floor(i / rows)
-            let position: number
-            if (x <= rightRows) position = x * (columns + 1) + y
-            else position = rightRows * (columns + 1) + (x - rightRows) * columns + y
-            ans.push(arr[position])
-        }
-        // Fixme: replace to HQ music not working.
-        return decodeURIComponent(ans.join('')).replace(/\^/g, '0')// replace('//m5', '//m6').replace('l.mp3', 'h.mp3')
+    private parsePlayingUrl(meta: any): string {
+        const onlineSongAudio = this.getApproriateAudio(meta.allAudios)
+        return onlineSongAudio.filePath
     }
 
     async searchSongs(keywords: string, withCookie?: string): Promise<Array<Wukong.ISong>> {
@@ -117,8 +117,9 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
         const song = await this.load(songId, true) as Wukong.ISong & { meta: any }
+        const meta = JSON.parse(song.meta)
         return {
-            file: this.parsePlayingUrl(JSON.parse(song.meta).location)
+            file: this.parsePlayingUrl(meta)
         }
     }
 
@@ -198,7 +199,7 @@ export default class XiamiMusicProvider extends BaseProvider {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-FORWARDED-FOR': '42.156.140.237',
                 'CLIENT-IP': '42.156.140.237',
-                'Cookie': `_xiamitoken=${token}; ${this.sessionCookie}`
+                'Cookie': `_xiamitoken=${token}; ${this.getCookieHeader(withCookie).Cookie}`
             }
         }))
         if (res.state !== 0) {
