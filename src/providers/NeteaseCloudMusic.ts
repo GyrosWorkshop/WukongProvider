@@ -167,7 +167,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return rawArray.map((o: any) => {
             let albumUrl = o.al && o.al.picUrl,
                 albumPicId = o.al && o.al.pic_str
-            if (albumPicId !== '0') {
+            if (albumPicId && albumPicId !== '0') {
                 albumUrl = this.getImageUrl(albumPicId)
             }
             let musicUrl: string
