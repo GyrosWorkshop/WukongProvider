@@ -122,7 +122,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     private getImageUrl(fId: string) {
-        return `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(fId)}/${fId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
+        return fId ? `http://p3.music.126.net/${NeteaseCloudMusicProvider.encryptDfsId(fId)}/${fId}.jpg?param=${NeteaseCloudMusicProvider.imageSize}y${NeteaseCloudMusicProvider.imageSize}`
+            : null
     }
 
     private convertToSongApiV1(rawArray: Array<any>, isDetailed: boolean = false): Array<Wukong.ISong> {
