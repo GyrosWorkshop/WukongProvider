@@ -7,7 +7,7 @@
     "test": "mocha --compilers ts:ts-node/register -t 10000",
     "testapi": "env api=1 npm run test",
     "start": "node lib/index.js",
-    "debug": "ts-node src/index.ts",
+    "dev": "env TS_NODE_FAST=1 TS_NODE_CACHE_DIRECTORY=tmp ts-node src/index.ts",
     "build": "tsc --rootDir src --outDir lib",
     "lint": "tslint src/**/*.ts && tslint src/*.ts",
     "typings": "typings prune && typings install",
