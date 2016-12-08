@@ -117,7 +117,7 @@ export default class XiamiMusicProvider extends BaseProvider {
     }
 
     public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
-        const song = await this.load(songId, true) as Wukong.ISong & { meta: any }
+        const song = await this.getSongInfoOnline(songId, withCookie)
         const meta = JSON.parse(song.meta)
         return {
             file: this.parsePlayingUrl(meta)
