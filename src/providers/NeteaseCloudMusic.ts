@@ -383,7 +383,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             this.musicFileUrlCache.set(songId, result)
         } else {
             result = {
-                file: 'https://oh55fiz85.qnssl.com/avstatic/unavailable.mp3?unavailable'
+                file: 'http://cdn.qn.hb-sem.senorsen.com/avstatic/unavailable.mp3?unavailable'
             }
         }
         return result
