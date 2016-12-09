@@ -90,18 +90,20 @@ class Controller {
      * @apiParam {Boolean} [withFileUrl=false]
      * @apiParam {Boolean} [withMvUrl=false]
      * @apiParam {string} [withCookie]
+     * @apiParam {string} [sendPlayLog=true] If valid cookie is provided and withFileUrl is set, play log will be sended to netease-cloud-music to track your play count.
      * @apiSuccessExample Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *      }
      */
     async songInfo(req: express.Request) {
-        const {siteId, songId, withFileUrl = false, withMvUrl = false, withCookie} = req.body as {
+        const {siteId, songId, withFileUrl = false, withMvUrl = false, withCookie, sendPlayLog = true} = req.body as {
             siteId: string
             songId: string
             withFileUrl: boolean
             withMvUrl: boolean
             withCookie: string
+            sendPlayLog: true
         }
         if (!siteId || !songId) {
             throw new Error('IllegalArgumentException siteId or songId is not valid.')
@@ -113,7 +115,7 @@ class Controller {
         console.log('Request songInfo', req.body)
         const song = await provider.getSongInfo(songId, withCookie)
         if (withFileUrl) {
-            song.music = await provider.getPlayingUrl(songId, withCookie)
+            song.music = await provider.getPlayingUrl(songId, withCookie, sendPlayLog)
         }
         if (withMvUrl && Number(song.mvId)) {
             song.mv = await provider.getMvUrl(song.mvId)
