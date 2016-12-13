@@ -321,7 +321,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     public async getSongInfo(songId: string, withCookie?: string | any): Promise<Wukong.ISong> {
         const key = `song-${songId}`
         let song = await this.load(songId, true) as Wukong.ISong
-        if (withCookie || !song) {
+        if (!song) {
             const headers = this.getCookieHeader(withCookie)
             let body = NeteaseCloudMusicProvider.encryptRequest({
                 id: songId,

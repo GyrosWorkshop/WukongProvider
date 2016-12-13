@@ -38,7 +38,7 @@ export default class XiamiMusicProvider extends BaseProvider {
     async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
         let song: Wukong.ISong = await this.load(songId, true)
         let headers = this.getCookieHeader(withCookie)
-        if (!song || headers.cookie) {
+        if (!song) {
             song = await this.getSongInfoOnline(songId, headers)
             if (!song) {
                 throw new Error('获取歌曲信息失败')
