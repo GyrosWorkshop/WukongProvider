@@ -113,9 +113,9 @@ class Controller {
             throw new Error('site provider not exist.')
         }
         console.log('Request songInfo', req.body)
-        const song = await provider.getSongInfo(songId, withCookie)
+        const song = _.omit(await provider.getSongInfo(songId, withCookie), ['meta', 'detail']) as Wukong.ISong
         if (withFileUrl) {
-            song.music = await provider.getPlayingUrl(songId, withCookie, sendPlayLog)
+            song.musics = await provider.getPlayingUrl(songId, withCookie, sendPlayLog)
         }
         if (withMvUrl && Number(song.mvId)) {
             song.mv = await provider.getMvUrl(song.mvId)

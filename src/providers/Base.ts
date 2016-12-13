@@ -98,10 +98,24 @@ abstract class BaseMusicProvider {
         return !!/\[\d+:\d+\.\d+\]/.exec(lyric)
     }
 
+    protected parseAudioQuality(bitrate: Number) {
+        let quality: string = null
+        if (bitrate >= 500000) {
+            quality = 'lossless'
+        } else if (bitrate >= 320000) {
+            quality = 'high'
+        } else if (bitrate >= 192000) {
+            quality = 'medium'
+        } else if (bitrate > 0) {   // actually 128000
+            quality = 'low'
+        }
+        return quality
+    }
+
     abstract async searchSongs(searchKey: string, withCookie?: string): Promise<Array<Wukong.ISong>>
     abstract async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong>
-    abstract async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFiles>
-    abstract async getMvUrl(mvId: string): Promise<Wukong.IFiles>
+    abstract async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFile[]>
+    abstract async getMvUrl(mvId: string): Promise<Wukong.IFile>
     abstract async getSongList(songListId: string, withCookie?: string): Promise<Wukong.ISongList>
     abstract async getUserSongLists(thirdPartyUserId: string, withCookie?: string): Promise<Wukong.ISongList[]>
     abstract async searchUsers(searchKey: string, withCookie?: string): Promise<Wukong.IThirdPartyUser[]>

@@ -106,6 +106,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
 
     private songSearchCache: Map<string, Wukong.ISong[]> = new Map()
     private musicFileUrlCache = new NodeCache({ stdTTL: 1800, checkperiod: 60 })
+    private musicFilesCache = new NodeCache({ stdTTL: 1800, checkperiod: 60 })
 
     constructor() {
         super()
@@ -206,7 +207,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }).filter((o) => <any>o)
     }
 
-    private getFiles(url: string | null): Wukong.IFiles {
+    private getFiles(url: string | null): Wukong.IFile {
         return url ? {
             file: url,
             fileViaCdn: url.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + (url.indexOf('?') === -1 ? '?' : '&') + 'cachecdn=1'
@@ -317,10 +318,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async getSongInfo(songId: string, withCookie?: string): Promise<Wukong.ISong> {
+    public async getSongInfo(songId: string, withCookie?: string | any): Promise<Wukong.ISong> {
         const key = `song-${songId}`
-        let song: Wukong.ISong = await this.load(songId, true)
-        if (!song) {
+        let song = await this.load(songId, true) as Wukong.ISong
+        if (withCookie || !song) {
             const headers = this.getCookieHeader(withCookie)
             let body = NeteaseCloudMusicProvider.encryptRequest({
                 id: songId,
@@ -335,13 +336,14 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 form: body,
                 headers
             })
+            resObject.songs[0].maxbr = resObject.privileges[0].maxbr
             song = this.convertToSongApiV2(resObject.songs, true)[0]
             try {
                 song.lyrics = await this.getSongLyrics(songId)
             } catch (err) {
                 console.error(err)
             }
-            Object.assign(song, { detail: true })
+            Object.assign(song, {meta: JSON.stringify(resObject.songs[0]), detail: true})
             song.mvId = resObject.songs[0].mv.toString()
             if (song.mvId === '0') song.mvId = ''
             await this.save(song)
@@ -355,43 +357,57 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return song
     }
 
-    public async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFiles> {
-        let result = this.musicFileUrlCache.get(songId) as Wukong.IFiles
-        if (result) {
-            console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, result)
-            return result
+    public async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFile[]> {
+        let results = this.musicFilesCache.get(songId) as Wukong.IFile[]
+        if (results) {
+            console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, results)
+            return results
         }
 
-        const song = await this.getSongInfo(songId, withCookie)
         const headers = this.getCookieHeader(withCookie)
-        let body = NeteaseCloudMusicProvider.encryptRequest({
-            ids: [songId],
-            br: song.bitrate,
-            csrf_token: ''
-        })
-        let resObject = await this.sendRequest({
-            uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/song/enhance/player/url`,
-            qs: {
+        const song = await this.getSongInfo(songId, headers) as Wukong.ISong & {meta: string}
+        const songMeta = JSON.parse(song.meta)
+
+        const definedQualityOptions = ['h', 'm', 'l']
+        let allBitrateOptions = definedQualityOptions.map(it => songMeta[it]).filter(it => it).map(it => it.br)
+        allBitrateOptions.push(songMeta.maxbr)
+        allBitrateOptions = _.uniq(allBitrateOptions)
+
+        results = _.uniqBy((await Promise.all(allBitrateOptions.map(async (bitrate) => {
+            const body = NeteaseCloudMusicProvider.encryptRequest({
+                ids: [songId],
+                br: bitrate,
                 csrf_token: ''
-            },
-            form: body,
-            headers
-        })
-        const url = resObject.data[0].url
-        result = this.getFiles(url) as Wukong.IFiles
-        if (result) {
-            this.musicFileUrlCache.set(songId, result)
+            })
+            const resObject = await this.sendRequest({
+                uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/song/enhance/player/url`,
+                qs: {
+                    csrf_token: ''
+                },
+                form: body,
+                headers
+            })
+            const url = resObject.data[0].url
+            const files = this.getFiles(url) as Wukong.IFile
+            files.audioBitrate = resObject.data[0].br
+            files.audioQuality = this.parseAudioQuality(files.audioBitrate)
+            files.format = resObject.data[0].type
+            return files
+        }))).filter(it => it), 'audioBitrate') as Wukong.IFile[]
+
+        if (results.length > 0) {
+            this.musicFilesCache.set(songId, results)
 
             // add netease-cloud-music play log (for count) when with valid cookie
             if (headers.Cookie && sendPlayLog) {
                 this.sendPlayLog(songId, headers)
             }
         } else {
-            result = {
+            results = [{
                 file: 'http://cdn.qn.hb-sem.senorsen.com/avstatic/unavailable.mp3?unavailable'
-            }
+            }]
         }
-        return result
+        return results
     }
 
     private async sendPlayLog(songId: string, headers: any) {
@@ -425,7 +441,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+    public async getMvUrl(mvId: string): Promise<Wukong.IFile> {
         let resObject = await this.sendRequest({
             uri: `${NeteaseCloudMusicProvider.apiPrefix}/api/mv/detail/`,
             qs: {

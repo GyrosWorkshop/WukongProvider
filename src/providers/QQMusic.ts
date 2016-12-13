@@ -105,7 +105,6 @@ export default class QQMusicProvider extends BaseProvider {
         song.length = Math.floor(parseFloat(baseInfo.interval) * 1000)
         song.siteId = this.providerName
         song.songId = songId
-        song.music = null
         song.artwork = { file: this.getArtworkUrl(baseInfo.album.mid) }
         song.webUrl = this.getWebUrl(songId)
         song.bitrate = this.getMaxAvailBitrate(baseInfo.file).bitrate
@@ -113,9 +112,29 @@ export default class QQMusicProvider extends BaseProvider {
         return song
     }
 
+    private getAllFiles(baseInfoFile: any): any {
+        const definedQualityTypes = [
+            // [ 999000, 'size_flac',   'flac', 'F000' ],      // dummy bitrate value
+            // [ 320000, 'size_320mp3', 'mp3',  'M800' ],
+            // [ 192000, 'size_192ogg', 'ogg' ],
+            // [ 192000, 'size_192aac', 'aac' ],
+            [ 128000, 'size_128mp3', 'mp3',  'M500' ],
+            // [  96000, 'size_96aac',  'aac' ],
+            // [  48000, 'size_48aac',  'aac' ],
+            [ 128000, 'size_128',    'm4a',  'C200' ]
+        ]
+        return definedQualityTypes.filter(it => baseInfoFile[it[1]]).map(it => ({ // weird syntax due to a tsc-related bug
+            bitrate: it[0],
+            key: it[1],
+            size: baseInfoFile[it[1]],
+            extension: it[2],
+            prefix: it[3]
+        }))
+    }
+
     private getMaxAvailBitrate(baseInfoFile: any): any {
         const bitrateKeyOrder = [
-            [ 320000, 'size_320mp3', 'mp3', 'M800' ],
+            // [ 320000, 'size_320mp3', 'mp3', 'M800' ],
             // [ 192000, 'size_192ogg', 'ogg' ],
             // [ 192000, 'size_192aac', 'aac' ],
             [ 128000, 'size_128mp3', 'mp3', 'M500' ],
@@ -152,7 +171,6 @@ export default class QQMusicProvider extends BaseProvider {
         song.length = Math.floor(parseFloat(f[7]) * 1000)
         song.siteId = this.providerName
         song.songId = f[20]
-        song.music = null
         song.artwork = { file: this.getArtworkUrl(imgId) }
         song.webUrl = this.getWebUrl(song.songId)
         song.bitrate = parseInt(f[13])
@@ -179,7 +197,7 @@ export default class QQMusicProvider extends BaseProvider {
         return 'http://y.gtimg.cn/music/photo_new/' + 'T002' + 'R300x300' + 'M000' + imgId + '.jpg' + '?max_age=2592000'
     }
 
-    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
             url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
@@ -192,18 +210,23 @@ export default class QQMusicProvider extends BaseProvider {
                 notice: 0,
                 platform: 'yqq',
                 needNewCode: 0,
-                guid: guid
+                guid
             }
         })
         const baseInfo: any = await this.getBaseInfo(songId)
-        const bitrateInfo = this.getMaxAvailBitrate(baseInfo.file)
+        console.log(baseInfo)
+        const rawFiles = this.getAllFiles(baseInfo.file)
         const key: string = JSON.parse(result.replace(/^jsonCallback\((.*)\);$/, '$1')).key
-        return {
-            file: `http://cc.stream.qqmusic.qq.com/${bitrateInfo.prefix}${songId}.${bitrateInfo.extension}?vkey=${key}&guid=${guid}&fromtag=0`
-        }
+        console.log(rawFiles)
+        return rawFiles.map((it: any) => ({
+            audioBitrate: it.bitrate,
+            audioQuality: this.parseAudioQuality(it.bitrate),
+            type: it.extension,
+            file: `http://cc.stream.qqmusic.qq.com/${it.prefix}${songId}.${it.extension}?vkey=${key}&guid=${guid}&fromtag=0`
+        }))
     }
 
-    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+    public async getMvUrl(mvId: string): Promise<Wukong.IFile> {
         return null
     }
 

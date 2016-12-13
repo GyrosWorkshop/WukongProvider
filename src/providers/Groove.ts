@@ -64,7 +64,7 @@ export default class GrooveProvider extends BaseProvider {
         return this.mapToISong((JSON.parse(result).Tracks.Items as Array<any>)[0])
     }
 
-    async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
+    async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
         let accessToken = await this.getAccessToken()
         const result = await this.sendRequest({
             url: `https://music.xboxlive.com/1/content/${songId}/preview`,
@@ -72,12 +72,12 @@ export default class GrooveProvider extends BaseProvider {
                 Authorization: 'Bearer ' + accessToken
             }
         })
-        return {
+        return [{
             file: JSON.parse(result).Url
-        }
+        }]
     }
 
-    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+    public async getMvUrl(mvId: string): Promise<Wukong.IFile> {
         return null
     }
 
@@ -90,7 +90,6 @@ export default class GrooveProvider extends BaseProvider {
         song.title = data.Name
         song.siteId = this.providerName
         song.songId = data.Id
-        song.music = null
         song.artwork = {
             file: data.ImageUrl
         }

@@ -79,7 +79,6 @@ export default class XiamiMusicProvider extends BaseProvider {
         } catch (e) {
             console.error('getSongInfoOnline: song bitrate parse failed', onlineSong)
         }
-        song.music = null
         song.lyrics = await this.getSongLyrics(onlineSong.lyric_url)
         return Object.assign(song, {meta: JSON.stringify(onlineSong), detail: true})
     }
@@ -116,15 +115,21 @@ export default class XiamiMusicProvider extends BaseProvider {
         return null
     }
 
-    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFiles> {
+    public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
         const song = await this.getSongInfoOnline(songId, withCookie)
         const meta = JSON.parse(song.meta)
-        return {
-            file: this.parsePlayingUrl(meta)
-        }
+        const files = meta.allAudios.map((audio: any) => {
+            return {
+                audioQuality: this.parseAudioQuality(audio.rate * 1000),
+                audioBitrate: audio.rate * 1000,
+                format: audio.format,
+                file: audio.filePath
+            }
+        })
+        return files
     }
 
-    public async getMvUrl(mvId: string): Promise<Wukong.IFiles> {
+    public async getMvUrl(mvId: string): Promise<Wukong.IFile> {
         return null
     }
 
