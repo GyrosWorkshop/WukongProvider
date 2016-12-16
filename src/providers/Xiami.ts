@@ -121,7 +121,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         const files = meta.allAudios.map((audio: any) => {
             return {
                 audioQuality: this.parseAudioQuality(audio.rate * 1000),
-                audioBitrate: audio.rate * 1000,
+                audioBitrate: audio.rate !== 640 ? audio.rate * 1000 : 999000,  // higher dummy value :-)
                 format: audio.format,
                 file: audio.filePath
             }
