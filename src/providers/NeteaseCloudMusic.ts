@@ -376,22 +376,24 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         results = _.uniqBy((await Promise.all(allBitrateOptions.map(async (bitrate) => {
             const body = NeteaseCloudMusicProvider.encryptRequest({
                 ids: [songId],
+                id: songId,
                 br: bitrate,
                 csrf_token: ''
             })
             const resObject = await this.sendRequest({
-                uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/song/enhance/player/url`,
+                uri: `${NeteaseCloudMusicProvider.apiPrefix}/weapi/song/enhance/${bitrate === songMeta.maxbr ? 'download' : 'player'}/url`,
                 qs: {
                     csrf_token: ''
                 },
                 form: body,
                 headers
             })
-            const url = resObject.data[0].url
+            const data = Array.isArray(resObject.data) ? resObject.data[0] : resObject.data
+            const url = data.url
             const files = this.getFiles(url) as Wukong.IFile
-            files.audioBitrate = resObject.data[0].br
+            files.audioBitrate = data.br
             files.audioQuality = this.parseAudioQuality(files.audioBitrate)
-            files.format = resObject.data[0].type
+            files.format = data.type ? data.type.toLowerCase() : 'unknown'
             return files
         }))).filter(it => it), 'audioBitrate') as Wukong.IFile[]
 
