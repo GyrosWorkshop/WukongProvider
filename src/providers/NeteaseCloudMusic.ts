@@ -358,7 +358,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     public async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFile[]> {
-        let results = this.musicFilesCache.get(songId) as Wukong.IFile[]
+        let results = this.musicFilesCache.get(songId + withCookie) as Wukong.IFile[]
         if (results) {
             console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, results)
             return results
