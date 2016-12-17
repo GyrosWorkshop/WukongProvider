@@ -391,6 +391,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             const data = Array.isArray(resObject.data) ? resObject.data[0] : resObject.data
             const url = data.url
             const files = this.getFiles(url) as Wukong.IFile
+            if (!files) return null
             files.audioBitrate = data.br
             files.audioQuality = this.parseAudioQuality(files.audioBitrate)
             files.format = data.type ? data.type.toLowerCase() : 'unknown'
