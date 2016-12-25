@@ -100,7 +100,7 @@ export default class QQMusicProvider extends BaseProvider {
         const song = {} as Wukong.ISong
         const baseInfo = await this.getBaseInfo(songId)
         song.album = baseInfo.album.name
-        song.artist = baseInfo.singer.map((it: any) => it.name).join(', ')
+        song.artist = baseInfo.singer.map((it: any) => it.name).join(' / ')
         song.title = baseInfo.title
         song.length = Math.floor(parseFloat(baseInfo.interval) * 1000)
         song.siteId = this.providerName
@@ -166,7 +166,7 @@ export default class QQMusicProvider extends BaseProvider {
         const imgId = f[22]
 
         song.album = this.entities.decode(f[5])
-        song.artist = this.entities.decode(data.fsinger)
+        song.artist = data.fsinger ? this.entities.decode(data.fsinger).replace(/;/g, ' / ') : ''
         song.title = this.entities.decode(f[1])
         song.length = Math.floor(parseFloat(f[7]) * 1000)
         song.siteId = this.providerName

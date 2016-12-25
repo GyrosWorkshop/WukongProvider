@@ -66,7 +66,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         song.songId = songId
         song.title = onlineSong.songName
         song.album = onlineSong.album_name
-        song.artist = onlineSong.artist || this.entities.decode(onlineSong.artist_name)
+        song.artist = onlineSong.singers.replace(/;/g, ' / ')
         song.artwork = {
             file: onlineSong.album_pic
         }
