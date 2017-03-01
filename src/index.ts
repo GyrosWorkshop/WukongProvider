@@ -18,8 +18,11 @@ const serverConfig = require('../server-config.json')
 const app = express()
 
 app.use(bodyParser.json())
-if (serverConfig.trust_proxy)
+if (process.env.TRUST_PROXY) {
+    app.set('trust proxy', process.env.TRUST_PROXY)
+} else if (serverConfig.trust_proxy) {
     app.set('trust proxy', serverConfig.trust_proxy)
+}
 app.use(morgan('combined'))
 app.use((req, res, next) => {
     res.set('X-Wukong-Provider-Version', version)
