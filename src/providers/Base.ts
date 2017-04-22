@@ -95,7 +95,7 @@ abstract class BaseMusicProvider {
     }
 
     protected checkLyricWithTimeline(lyric: string) {
-        return !!/\[\d+:\d+\.\d+\]/.exec(lyric)
+        return /\[[0-9]+\:[0-9]+(\.[0-9]+)?\]/.test(lyric)
     }
 
     protected parseAudioQuality(bitrate: Number) {
