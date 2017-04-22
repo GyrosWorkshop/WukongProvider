@@ -24,7 +24,7 @@ export default sequelize
 export const Lyric = sequelize.define('lyric', {
     lrc: Sequelize.BOOLEAN,
     translated: Sequelize.BOOLEAN,
-    content: Sequelize.TEXT
+    data: Sequelize.TEXT
 }, {
     indexes: [
         {
