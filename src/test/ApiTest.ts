@@ -19,13 +19,7 @@ describe('API', () => {
         assert.equal(song.title, '不为谁而作的歌')
         assert.equal(song.artist, '林俊杰')
         assert.equal(song.album, '不为谁而作的歌')
-        lyric = song.lyrics.map(it => {
-            return {
-                withTimeline: it.withTimeline,
-                translate: it.translate,
-                lyric: it.lyric
-            }
-        })
+        lyric = song.lyrics
     })
     it('search', async () => {
         const res = await rp({
@@ -130,9 +124,9 @@ describe('API', () => {
         assert.equal(song.album, '不为谁而作的歌')
         assert.deepEqual(lyric, song.lyrics.map(it => {
             return {
-                withTimeline: it.withTimeline,
-                translate: it.translate,
-                lyric: it.lyric
+                lrc: it.lrc,
+                translated: it.translated,
+                data: it.data
             }
         }))
     })

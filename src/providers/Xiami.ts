@@ -107,9 +107,9 @@ export default class XiamiMusicProvider extends BaseProvider {
                 url: url
             })
             return [{
-                translate: false,
-                withTimeline: this.checkLyricWithTimeline(res),
-                lyric: res
+                lrc: this.isLrcFormat(res),
+                translated: false,
+                data: res
             } as Wukong.ILyric]
         } catch (err) {}
         return null

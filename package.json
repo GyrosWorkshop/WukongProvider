@@ -1,6 +1,6 @@
 {
   "name": "wukong-provider-service",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "description": "A music website parser http api",
   "main": "index.js",
   "scripts": {

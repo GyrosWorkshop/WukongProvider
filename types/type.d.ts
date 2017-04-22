@@ -43,9 +43,9 @@ declare namespace Wukong {
 
 
     interface ILyric {
-        withTimeline: boolean
-        translate: boolean
-        lyric: string
+        lrc: boolean
+        translated: boolean
+        data: string
     }
 
     export interface IThirdPartyUser {

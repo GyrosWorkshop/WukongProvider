@@ -22,9 +22,9 @@ if (dbConfig) {
 export default sequelize
 
 export const Lyric = sequelize.define('lyric', {
-    withTimeline: Sequelize.BOOLEAN,
-    translate: Sequelize.BOOLEAN,
-    lyric: Sequelize.TEXT
+    lrc: Sequelize.BOOLEAN,
+    translated: Sequelize.BOOLEAN,
+    content: Sequelize.TEXT
 }, {
     indexes: [
         {

@@ -19,7 +19,7 @@ describe('XiamiMusicProvider', () => {
             assert.isString(song.artwork.file)
             assert.isTrue(song.artwork.file.startsWith('http'))
             assert.isArray(song.lyrics)
-            assert.isTrue(song.lyrics[0].lyric.indexOf('魔鬼中的天使') !== -1)
+            assert.isTrue(song.lyrics[0].data.indexOf('魔鬼中的天使') !== -1)
         })
     })
     describe('playing url', () => {

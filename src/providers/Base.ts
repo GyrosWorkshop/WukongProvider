@@ -94,8 +94,8 @@ abstract class BaseMusicProvider {
         }
     }
 
-    protected checkLyricWithTimeline(lyric: string) {
-        return /\[[0-9]+\:[0-9]+(\.[0-9]+)?\]/.test(lyric)
+    protected isLrcFormat(text: string) {
+        return /\[[0-9]+\:[0-9]+(\.[0-9]+)?\]/.test(text)
     }
 
     protected parseAudioQuality(bitrate: Number) {

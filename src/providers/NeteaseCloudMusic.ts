@@ -214,11 +214,11 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         } : null
     }
 
-    private convertLyric(rawData: any, translate: boolean, withTimeline: boolean): Wukong.ILyric {
+    private convertLyric(rawData: any, translated: boolean, lrc: boolean): Wukong.ILyric {
         return {
-            withTimeline,
-            translate,
-            lyric: rawData.lyric
+            lrc,
+            translated,
+            data: rawData.lyric
         }
     }
 
@@ -239,10 +239,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         if (resObject.code === 200) {
             if (resObject.lrc && resObject.lrc.lyric) {
                 const lyrics: Wukong.ILyric[] = []
-                const withTimeline = this.checkLyricWithTimeline(resObject.lrc.lyric)
-                lyrics.push(this.convertLyric(resObject.lrc, false, withTimeline))
+                const lrc = this.isLrcFormat(resObject.lrc.lyric)
+                lyrics.push(this.convertLyric(resObject.lrc, false, lrc))
                 if (resObject.tlyric && resObject.tlyric.lyric) {
-                    lyrics.push(this.convertLyric(resObject.tlyric, true, withTimeline))
+                    lyrics.push(this.convertLyric(resObject.tlyric, true, lrc))
                 }
                 return lyrics
             } else {

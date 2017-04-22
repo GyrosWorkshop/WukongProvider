@@ -44,9 +44,9 @@ export default class QQMusicProvider extends BaseProvider {
             const lyrics: Wukong.ILyric[] = []
             const lyricsContent = Buffer.from(resObject.lyric, 'base64').toString()
             lyrics.push({
-                withTimeline: !!/\[\d+:\d+\.\d+\]/.exec(lyricsContent),
-                translate: false,
-                lyric: lyricsContent
+                lrc: this.isLrcFormat(lyricsContent),
+                translated: false,
+                data: lyricsContent
             })
             return lyrics
         } catch (e) {
