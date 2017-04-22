@@ -43,7 +43,7 @@ declare namespace Wukong {
 
 
     interface ILyric {
-        lrc: boolean
+        lrc: boolean            // Is it LyRiCs format or not?
         translated: boolean
         data: string
     }
