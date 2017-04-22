@@ -1,7 +1,7 @@
 {
   "name": "wukong-provider-service",
   "version": "0.2.0",
-  "description": "A music website parser http api",
+  "description": "The universal music provider for Wukong Music.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --compilers ts:ts-node/register -t 10000",
