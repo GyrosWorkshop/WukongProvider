@@ -13,7 +13,7 @@ describe('NeteaseCloudMusicProvider', () => {
             assert.equal(songs[0].title, '不为谁而作的歌')
             assert.equal(songs[0].artist, '林俊杰')
             assert.equal(songs[1].title, '不为谁而作的歌')
-            assert.equal(songs[1].artist, '徐佳莹，林俊杰')
+            assert.equal(songs[1].artist, '徐佳莹 / 林俊杰')
         })
     })
     describe('getSongInfo', () => {

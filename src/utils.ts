@@ -3,25 +3,29 @@ import * as qs from 'querystring'
 import * as _ from 'lodash'
 
 export function guessFromSongListUrl(link: string): SiteSongList {
-    const url = Url.parse(link)
-    let result: SiteSongList
-    switch (url.hostname.toLowerCase()) {
-    case 'music.163.com':
-        result = {
-            siteId: 'netease-cloud-music',
-            songListId: guessFromSongListNetease(url).toString()
+    try {
+        const url = Url.parse(link)
+        let result: SiteSongList
+        switch (url.hostname.toLowerCase()) {
+        case 'music.163.com':
+            result = {
+                siteId: 'netease-cloud-music',
+                songListId: guessFromSongListNetease(url).toString()
+            }
+            break
+        case 'www.xiami.com':
+            result = {
+                siteId: 'Xiami',
+                songListId: guessFromSongListXiami(url).toString()
+            }
+            break
+        default:
+            throw new Error('unknown site or unsupported')
         }
-        break
-    case 'www.xiami.com':
-        result = {
-            siteId: 'Xiami',
-            songListId: guessFromSongListXiami(url).toString()
-        }
-        break
-    default:
-        throw new Error('unknown site or unsupported')
+        return result
+    } catch (e) {
+        return null
     }
-    return result
 }
 
 function guessFromSongListNetease(url: Url.Url): string {

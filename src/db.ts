@@ -2,7 +2,7 @@ import * as Sequelize from 'sequelize'
 import {join} from 'path'
 const dbConfig = require('../server-config.json').database
 
-let sequelize: Sequelize.Connection
+let sequelize: Sequelize.Sequelize
 if (dbConfig) {
     // Use postgresql connection uri
     sequelize = new Sequelize(dbConfig, {

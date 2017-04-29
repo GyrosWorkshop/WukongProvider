@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'

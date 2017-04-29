@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 import * as rp from 'request-promise'
 import BaseProvider from './Base'
 import {autobind} from 'core-decorators'
