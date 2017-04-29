@@ -90,8 +90,23 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     // https://gist.github.com/buoge/a3a0774e6e19a5c2ed820331ce4a08dd
     private parsePlayingUrl(meta: any): string {
-        const onlineSongAudio = this.getApproriateAudio(meta.allAudios)
-        return onlineSongAudio.filePath
+        const location = meta.location
+        const arr = location.split('')
+        const rows = parseInt(arr.shift())
+        const columns = Math.floor(arr.length / rows)
+        const rightRows = arr.length % rows
+        let iteration = 0
+        const ans: Array<string> = []
+        for (let i = 0; i !== arr.length; ++i) {
+            const x = i % rows
+            const y = Math.floor(i / rows)
+            let position: number
+            if (x <= rightRows) position = x * (columns + 1) + y
+            else position = rightRows * (columns + 1) + (x - rightRows) * columns + y
+            ans.push(arr[position])
+        }
+        // Fixme: replace to HQ music not working.
+        return decodeURIComponent(ans.join('')).replace(/\^/g, '0')// replace('//m5', '//m6').replace('l.mp3', 'h.mp3')
     }
 
     async searchSongs(keywords: string, withCookie?: string): Promise<Array<Wukong.ISong>> {
@@ -118,15 +133,11 @@ export default class XiamiMusicProvider extends BaseProvider {
     public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
         const song = await this.getSongInfoOnline(songId, withCookie)
         const meta = JSON.parse(song.meta)
-        const files = meta.allAudios.map((audio: any) => {
-            return {
-                audioQuality: this.parseAudioQuality(audio.rate * 1000),
-                audioBitrate: audio.rate !== 640 ? audio.rate * 1000 : 999000,  // higher dummy value :-)
-                format: audio.format,
-                file: audio.filePath
-            }
-        })
-        return files
+        return [{
+            file: this.parsePlayingUrl(meta),
+            audioQuality: 'low',
+            audioBitrate: 128000
+        }]
     }
 
     public async getMvUrl(mvId: string): Promise<Wukong.IFile> {
