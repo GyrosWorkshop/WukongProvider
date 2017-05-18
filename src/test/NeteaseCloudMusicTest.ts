@@ -25,6 +25,10 @@ describe('NeteaseCloudMusicProvider', () => {
             assert.equal(song.title, '不为谁而作的歌')
             assert.equal(song.artist, '林俊杰')
             assert.equal(song.album, '不为谁而作的歌')
+            const url = await provider.getPlayingUrl(songId)
+            assert.isArray(url)
+            assert.isAtLeast(url.length, 1)
+            url.forEach( it => assert.isTrue(it.file.startsWith('http')))
         })
     })
     describe('getSongInfo', () => {
@@ -36,6 +40,10 @@ describe('NeteaseCloudMusicProvider', () => {
             assert.equal(song.title, 'おどるポンポコリン')
             assert.equal(song.artist, 'B.B.クイーンズ')
             assert.equal(song.album, 'おどるポンポコリン~ちびまる子ちゃん 誕生25th Version~')
+            const url = await provider.getPlayingUrl(songId)
+            assert.isArray(url)
+            assert.isAtLeast(url.length, 1)
+            url.forEach( it => assert.isTrue(it.file.startsWith('http')))
         })
     })
     describe('getSongList', () => {

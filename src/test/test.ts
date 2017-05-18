@@ -1,8 +1,8 @@
 if (process.env.api) {
     require('./ApiTest')
 } else {
-    require('./QQMusicTest')
+    // require('./QQMusicTest')
     require('./NeteaseCloudMusicTest')
-    require('./XiamiTest')
+    // require('./XiamiTest')
     require('./utilsTest')
 }

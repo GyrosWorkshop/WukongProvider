@@ -176,9 +176,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             let bitrate = 0
             let musicAvail: boolean = false
             for (let musicType of ['h', 'm', 'l', 'b']) {
-                if (o[musicType] && o[musicType].fid) {
+                if (o[musicType]) {
                     musicAvail = true
-                    musicUrl = `${musicUrlDomain}${NeteaseCloudMusicProvider.encryptDfsId(o[musicType].fid)}/${o[musicType].fid}.mp3`
+                    // Richard: Currently each music file url is is returned by API. So we do not calculate url here.
+                    // musicUrl = `${musicUrlDomain}${NeteaseCloudMusicProvider.encryptDfsId(o[musicType].fid)}/${o[musicType].fid}.mp3`
                     bitrate = o[musicType].br
                     break
                 }
