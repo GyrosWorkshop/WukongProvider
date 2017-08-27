@@ -1,0 +1,14 @@
+{
+    "apps" : [{
+        "name"        : "wukong-provider",
+        "script"      : "lib/index",
+        "args"        : [],
+        "watch"       : false,
+        "node_args"   : "--harmony",
+        "merge_logs"  : true,
+        "cwd"         : "",
+        "env": {
+            "NODE_ENV": "production"
+        }
+    }]
+}
