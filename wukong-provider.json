@@ -1,7 +1,7 @@
 {
     "apps" : [{
         "name"        : "wukong-provider",
-        "script"      : "lib/index",
+        "script"      : "lib/index.js",
         "args"        : [],
         "watch"       : false,
         "node_args"   : "--harmony",
