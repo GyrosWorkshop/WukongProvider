@@ -29,6 +29,7 @@ declare namespace Wukong {
         format?: string
         file: string
         fileViaCdn?: string
+        unavailable?: boolean
     }
     export interface IUser {
         nickname: string
