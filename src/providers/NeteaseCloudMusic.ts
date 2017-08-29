@@ -104,8 +104,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    private songSearchCache: Map<string, Wukong.ISong[]> = new Map()
-    private musicFileUrlCache = new NodeCache({ stdTTL: 1800, checkperiod: 60 })
+    private songSearchCache = new NodeCache({ stdTTL: 1800, checkperiod: 60})
     private musicFilesCache = new NodeCache({ stdTTL: 1800, checkperiod: 60 })
 
     constructor() {
@@ -286,8 +285,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         searchKey = searchKey.trim()
         const offset = 0, limit = 30
         const key = `search-${searchKey}-offset-${offset}-limit-${limit}-${withCookie}`
-        if (this.songSearchCache.has(key)) {
-            return this.songSearchCache.get(key)
+        if (this.songSearchCache.get(key)) {
+            return this.songSearchCache.get(key) as Wukong.ISong[]
         }
 
         const headers = this.getCookieHeader(withCookie)
@@ -398,11 +397,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
 
         if (results.length > 0) {
             this.musicFilesCache.set(songId, results)
-
-            // add netease-cloud-music play log (for count) when with valid cookie
-            if (headers.Cookie && sendPlayLog) {
-                this.sendPlayLog(songId, headers)
-            }
         } else {
             results = [{
                 unavailable: true,
