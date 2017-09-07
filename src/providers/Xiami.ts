@@ -51,9 +51,9 @@ export default class XiamiMusicProvider extends BaseProvider {
     private async getSongInfoOnline(songId: string, cookie?: string | any): Promise<Wukong.ISong & {meta: string, detail: boolean}> {
         if (!songId) return null
         const headers = this.getCookieHeader(cookie)
-        const url = `http://www.xiami.com/song/playlist/id/${songId}/object_name/default/object_id/0/cat/json`
+        const uri = `http://www.xiami.com/song/playlist/id/${songId}/object_name/default/object_id/0/cat/json`
         const res = await this.sendRequest({
-            url,
+            uri,
             json: true,
             headers
         })
@@ -171,6 +171,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         return rawArray.map((it: any) => {
             it.album_logo = it.album_logo.replace('1.jpg', '4.jpg')     // high resolution
             return {
+                available: true,
                 siteId: this.providerName,
                 songId: it.song_id.toString(),
                 title: it.song_name,
@@ -189,7 +190,7 @@ export default class XiamiMusicProvider extends BaseProvider {
     private async getXiamiToken(): Promise<string> {
         const jar = Request.jar()
         const res = await this.sendRequest({
-            url: 'http://www.xiami.com/web/login',
+            uri: 'http://www.xiami.com/web/login',
             jar
         })
         const cookies = jar.getCookieString('http://xiami.com').split('=')[1]
@@ -205,7 +206,7 @@ export default class XiamiMusicProvider extends BaseProvider {
         const token = await this.getXiamiToken()
 
         const res = JSON.parse(await this.sendRequest({
-            url: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
+            uri: 'http://api.xiami.com/web?v=2.0&app_key=1&r=collect/detail&type=collectId',
             qs: {
                 id: songListId
             },

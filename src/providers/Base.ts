@@ -1,93 +1,81 @@
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'
-// import * as LRU from 'lru-cache'
-import sequelize, {Song, Lyric} from '../db'
+import { RedisClient } from 'redis';
+import * as Bluebird from 'bluebird'
 
 abstract class BaseMusicProvider {
     /**
-     * set provider name, eg: netease-cloud-music
+     * Return the provider's name, e.g. netease-cloud-music.
      */
     abstract get providerName(): string
 
-    // private previousErrorSongRequest = LRU({
-    //     max: 50,
-    //     maxAge: 1000 * 3
-
-    // })
+    redis: RedisClient
 
     protected RequestOptions: Request.CoreOptions = {
         headers: {
-            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
+            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
             'Accept' : '*/*',
             'Accept-Language' : 'zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4,ja;q=0.2'
         }
     }
 
-    protected sendRequest(options: Request.Options): PromiseLike<any> {
-        const defaultOption = _.merge(JSON.parse(JSON.stringify(this.RequestOptions)), options)
+    protected sendRequest(options: Request.OptionsWithUri): PromiseLike<any> {
+        const defaultOption = _.merge(_.cloneDeep(this.RequestOptions), options)
+        console.info(`Send request by ${this.providerName}: ${options.uri}`)
         return rp(defaultOption)
     }
 
-    /**
-     * Currently only new one created. (update not available)
-     */
-    protected async save(song: Wukong.ISong & {meta?: string, detail?: boolean}): Promise<void> {
-        const saveSong: Wukong.ISong = _.cloneDeep(song)
-        if (saveSong.artwork && !_.isString(saveSong.artwork)) saveSong.artwork = (<any>saveSong.artwork).file
-        let dbSong = await Song.findOne({
-            where: {
-                songId: saveSong.songId,
-                siteId: saveSong.siteId
-            }
-        }) as any
-        if (dbSong) {
-            await Song.update(saveSong, {
-                where: {
-                    songId: saveSong.songId,
-                    siteId: saveSong.siteId
-                }
-            })
-        } else {
-            dbSong = await Song.create(saveSong)
-        }
+    private getSongRedisKey(siteId: string, songId: string): string {
+        return `song:${siteId}.${songId}`
+    }
 
-        if (saveSong.lyrics) {
-            const songKey = dbSong.getDataValue('id')
-            await Lyric.destroy({
-                where: {
-                    songId: songKey
-                }
-            })
-            await Lyric.bulkCreate(saveSong.lyrics.map(it => Object.assign(it, { songId: songKey })))
+    protected save(song: Wukong.ISong & {meta?: string, detail?: boolean}) {
+        try {
+            if (!song.available)
+                return console.info(`save nothing for unavailable ${song.siteId}.${song.songId}`)
+
+            const saveSong: Wukong.ISong = _.cloneDeep(song)
+            if (saveSong.artwork && !_.isString(saveSong.artwork)) saveSong.artwork = (<any>saveSong.artwork).file
+            const key = this.getSongRedisKey(song.siteId, song.songId)
+            // Cache song for 30d.
+            this.redis.set(key, JSON.stringify(saveSong), 'EX', 3600 * 24 * 30)
+        } catch (e) {
+            // tolerate
+            console.error(`save err ${song.siteId}.${song.songId}`, e)
         }
     }
 
-    protected async bulkSave(songs: (Wukong.ISong & {meta?: string, detail?: boolean})[]): Promise<void> {
+    protected bulkSave(songs: (Wukong.ISong & {meta?: string, detail?: boolean})[]) {
         try {
-            await Promise.all(songs.map(song => Song.upsert(song)))
+            songs.forEach(song => this.save(song))
         } catch (e) {
             // tolerate
-            console.error('bulkSave err', e)
+            console.error(`bulkSave err`, e)
         }
     }
 
     protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong> {
-        const data = await Song.findOne({
-            where: {
-                songId: songId,
-                siteId: this.providerName
-            },
-            include: [
-                {
-                    model: Lyric,
-                    as: 'lyrics'
+        try {
+            const key = this.getSongRedisKey(this.providerName, songId)
+            const data = JSON.parse(await Bluebird.promisify(this.redis.get, {
+                context: this.redis
+            })(key))
+            if (data) {
+                console.info(`Cache HIT for ${key}`)
+                if (needDetail) {
+                    return data
+                } else {
+                    data.lyrics = []
+                    return data
                 }
-            ]
-        }) as any
-        if (data && ((needDetail && data.dataValues.detail) || !needDetail)) {
-            return this.formatRow(data.dataValues)
-        } else {
+            } else {
+                console.info(`Cache MISS for ${key}`)
+                return null
+            }
+        } catch (e) {
+            // tolerate
+            console.error(`load err ${this.providerName}.${songId}`, e)
             return null
         }
     }

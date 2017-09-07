@@ -33,7 +33,7 @@ export default class QQMusicProvider extends BaseProvider {
         }
         try {
             const resObject = JSON.parse((await this.sendRequest({
-                url: 'http://i.y.qq.com/lyric/fcgi-bin/fcg_query_lyric.fcg',
+                uri: 'http://i.y.qq.com/lyric/fcgi-bin/fcg_query_lyric.fcg',
                 qs
             })).trim().replace(jsonpCallback + '(', '').replace(/\)$/, ''))
             if (!(resObject.retcode === 0 && resObject.code === 0 && resObject.subcode === 0 && resObject.lyric)) {
@@ -67,7 +67,7 @@ export default class QQMusicProvider extends BaseProvider {
     async searchSongs(keywords: string, withCookie?: string): Promise<Array<Wukong.ISong>> {
         const offset = 0, limit = 30
         const result = await this.sendRequest({
-            url: 'http://s.music.qq.com/fcgi-bin/music_search_new_platform',
+            uri: 'http://s.music.qq.com/fcgi-bin/music_search_new_platform',
             qs: {
                 t: 0,
                 n: limit,
@@ -177,7 +177,7 @@ export default class QQMusicProvider extends BaseProvider {
 
     async getBaseInfo(songId: string): Promise<any> {
         const res = await this.sendRequest({
-            url: 'http://i.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg',
+            uri: 'http://i.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg',
             qs: {
                 'songmid': songId,
                 'tpl': 'yqq_song_detail'
@@ -198,7 +198,7 @@ export default class QQMusicProvider extends BaseProvider {
     public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
         const guid = Math.floor(Math.random() * 9999999999)
         const result: string = await this.sendRequest({
-            url: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
+            uri: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
             qs: {
                 json: 3,
                 loginUin: 0,

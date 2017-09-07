@@ -3,10 +3,12 @@
     "provider": ["QQMusic", "netease-cloud-music"],
     "netease-cloud-music-api-prefix": "http://music.163.com",
     "netease-cloud-music-bin-cdn": null,
-    "Groove": {
-      "ClientId": "",
-      "ClientSecret": ""
-    },
     "trust_proxy": "127.0.0.1",
-    "database (rename this)": "postgres://wukong:password@127.0.0.1/wukong"
+    "redis": {
+      "host": "127.0.0.1",
+      "port": 6379,
+      "password": "dummypassword",
+      "db": 0,
+      "prefix": "wukong-provider:"
+    }
 }

@@ -1,6 +1,5 @@
 import NeteaseCloudMusicProvider from './providers/NeteaseCloudMusic'
 import QQMusicProvider from './providers/QQMusic'
-import GrooveProvider from './providers/Groove'
 import XiamiProvider from './providers/Xiami'
 import BaseMusicProvider from './providers/Base'
 import {guessFromSongListUrl} from './utils'
@@ -11,6 +10,7 @@ import * as morgan from 'morgan'
 import * as http from 'http'
 import * as bodyParser from 'body-parser'
 import * as rp from 'request-promise'
+import * as Redis from 'redis'
 import {autobind} from 'core-decorators'
 
 const version = require('../package.json').version
@@ -28,7 +28,8 @@ app.use((req, res, next) => {
     res.set('X-Wukong-Provider-Version', version)
     next()
 })
-http.createServer(app).listen(process.env.port || 3120)
+
+const redisClient = Redis.createClient(serverConfig.redis)
 
 const providers = new Map<string, BaseMusicProvider>()
 const qqProvider = new QQMusicProvider()
@@ -36,9 +37,11 @@ const neteaseProvider = new NeteaseCloudMusicProvider()
 const xiamiProvider = new XiamiProvider()
 
 providers.set(qqProvider.providerName, qqProvider)
-// providers.set(GrooveProvider.providerName, new GrooveProvider())
 providers.set(neteaseProvider.providerName, neteaseProvider)
 providers.set(xiamiProvider.providerName, xiamiProvider)
+
+// Inject redis client.
+providers.forEach(p => p.redis = redisClient)
 
 @autobind
 class Controller {
@@ -253,7 +256,8 @@ class Controller {
 }
 
 new Controller(app)
-
-console.log(`wukong provider ${version} started. `)
-
+const port = process.env.port || 3120
+http.createServer(app).listen(port)
 module.exports = app
+
+console.log(`WukongProvider ${version} started at port ${port}`)
