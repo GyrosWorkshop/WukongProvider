@@ -7,6 +7,7 @@ declare namespace Wukong {
         songId: string
     }
     export interface ISong extends IClientSong {
+        available: boolean
         title: string
         artist: string
         album: string

@@ -14,6 +14,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     get providerName() {
         return 'netease-cloud-music'
     }
+
     static apiPrefix = serverConfig['netease-cloud-music-api-prefix']
     static binCdn = serverConfig['netease-cloud-music-bin-cdn']
     static imageSize = 400
@@ -111,9 +112,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         super()
         this.RequestOptions.headers['Referer'] = 'http://music.163.com/'
         this.RequestOptions.headers['Origin'] = 'http://music.163.com'
-        if (serverConfig.useCookie && _.isString(serverConfig.useCookie['netease-cloud-music'])) {
-            this.RequestOptions.headers['Cookie'] = serverConfig.useCookie['netease-cloud-music']
-        }
         this.RequestOptions.method = 'POST'
     }
 
@@ -126,45 +124,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             : null
     }
 
-    private convertToSongApiV1(rawArray: Array<any>, isDetailed: boolean = false): Array<Wukong.ISong> {
-        return rawArray.map((o: any) => {
-            let albumUrl = o.album && o.album.picUrl,
-                albumPicId = o.album && o.album.picId
-            if (albumPicId !== '0') {
-                albumUrl = this.getImageUrl(albumPicId)
-            }
-            let musicUrl = o.mp3Url
-            let musicUrlDomain = musicUrl ? /http:\/\/(.+?)\//.exec(musicUrl)[0] : 'http://m2.music.126.net/'
-            let bitrate = 0
-            for (let musicType of ['hMusic', 'mMusic', 'lMusic', 'bMusic']) {
-                if (o[musicType]) {
-                    musicUrl = `${musicUrlDomain}${NeteaseCloudMusicProvider.encryptDfsId(o[musicType].dfsId)}/${o[musicType].dfsId}.${o[musicType].extension}`
-                    bitrate = o[musicType].bitrate
-                    break
-                }
-            }
-            if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
-                musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
-            }
-            const songLength = o.duration
-            const songId = o.id.toString()
-            return {
-                siteId: this.providerName,
-                songId,
-                title: o.name,
-                file: musicUrl,
-                artist: o.artists && o.artists.map((a: any) => a.name).join(' / '),
-                album: o.album && o.album.name,
-                artwork: albumUrl ? this.getFiles(albumUrl) : null,
-                webUrl: this.getWebUrl(songId),
-                length: songLength,
-                bitrate
-            }
-        })
-    }
-
-    private convertToSongApiV2(rawArray: Array<any>, isDetailed: boolean = false): Array<Wukong.ISong> {
-        return rawArray.map((o: any) => {
+    private translateRawToSong(rawArray: Array<any>, isDetailed: boolean = false, privileges: Array<any> = null): Array<Wukong.ISong> {
+        return rawArray.map((o: any, i) => {
             let albumUrl = o.al && o.al.picUrl,
                 albumPicId = o.al && o.al.pic_str
             if (albumPicId && albumPicId !== '0') {
@@ -173,36 +134,39 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             let musicUrl: string
             let musicUrlDomain = musicUrl ? /http:\/\/(.+?)\//.exec(musicUrl)[0] : 'http://m2.music.126.net/'
             let bitrate = 0
-            let musicAvail: boolean = false
+            let available = false
             for (let musicType of ['h', 'm', 'l', 'b']) {
                 if (o[musicType]) {
-                    musicAvail = true
+                    available = true
                     // Richard: Currently each music file url is is returned by API. So we do not calculate url here.
                     // musicUrl = `${musicUrlDomain}${NeteaseCloudMusicProvider.encryptDfsId(o[musicType].fid)}/${o[musicType].fid}.mp3`
                     bitrate = o[musicType].br
                     break
                 }
             }
+
+            // Mark from official permission table.
+            // - o.pc: cloud disk
+            // - privileges[i].pl: play permission
+            if (!o.pc && privileges && privileges[i].pl === 0) available = false
+
             if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
                 musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
             }
             const songLength = o.dt
             const songId = o.id.toString()
-            if (musicAvail) {
-                return {
-                    siteId: this.providerName,
-                    songId: songId,
-                    title: o.name,
-                    file: null,
-                    artist: o.ar && o.ar.map((a: any) => a.name).join(' / '),
-                    album: o.al && o.al.name,
-                    artwork: albumUrl ? this.getFiles(albumUrl) : null,
-                    webUrl: this.getWebUrl(songId),
-                    length: songLength,
-                    bitrate
-                }
-            } else {
-                return null
+            return {
+                available,
+                siteId: this.providerName,
+                songId: songId,
+                title: o.name,
+                file: null,
+                artist: o.ar && o.ar.map((a: any) => a.name).join(' / '),
+                album: o.al && o.al.name,
+                artwork: albumUrl ? this.getFiles(albumUrl) : null,
+                webUrl: this.getWebUrl(songId),
+                length: songLength,
+                bitrate
             }
         }).filter((o) => <any>o)
     }
@@ -210,7 +174,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     private getFiles(url: string | null): Wukong.IFile {
         return url ? {
             file: url,
-            fileViaCdn: url.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + (url.indexOf('?') === -1 ? '?' : '&') + 'cachecdn=1'
+            fileViaCdn: url.replace(/^https?:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + (url.indexOf('?') === -1 ? '?' : '&') + 'cachecdn=1'
         } : null
     }
 
@@ -305,7 +269,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 form: body,
                 headers
             })
-            let songList = this.convertToSongApiV2(resObject.result.songs, false)
+            let songList = this.translateRawToSong(resObject.result.songs, false)
             this.songSearchCache.set(key, songList)
             return songList
         } catch (err) {
@@ -334,7 +298,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 headers
             })
             resObject.songs[0].maxbr = resObject.privileges[0].maxbr
-            song = this.convertToSongApiV2(resObject.songs, true)[0]
+            console.log(resObject.privileges[0])
+            song = this.translateRawToSong(resObject.songs, true, resObject.privileges)[0]
             try {
                 song.lyrics = await this.getSongLyrics(songId)
             } catch (err) {
@@ -451,7 +416,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    protected async sendRequest(options: Request.Options): Promise<any> {
+    protected async sendRequest(options: Request.OptionsWithUri): Promise<any> {
         const ret = await super.sendRequest(options)
         try {
             return JSON.parse(ret)
@@ -465,11 +430,11 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         }
     }
 
-    private async getPage(options: Request.Options): Promise<String> {
+    private async getPage(options: Request.OptionsWithUri): Promise<String> {
         return await super.sendRequest(options)
     }
 
-    private mapToSongList(rawData: any, withSongs: boolean = false): Wukong.ISongList {
+    private mapToSongList(rawData: any, withSongs: boolean = false, privileges: Array<any> = null): Wukong.ISongList {
         return {
             siteId: this.providerName,
             songListId: rawData.id.toString(),
@@ -479,7 +444,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             description: rawData.description,
             createTime: (new Date(rawData.createTime)).toISOString(),
             cover: this.getImageUrl(rawData.coverImgId),
-            songs: withSongs ? this.convertToSongApiV2(rawData.tracks) : null,
+            songs: withSongs ? this.translateRawToSong(rawData.tracks, false, privileges) : null,
             songCount: rawData.trackCount
         }
     }
@@ -503,7 +468,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             headers
         })
         if (resObject.code === 200) {
-            return this.mapToSongList(resObject.playlist, true)
+            return this.mapToSongList(resObject.playlist, true, resObject.privileges)
         } else {
             throw new Error('NeteaseCloudMusicProvider getSongList: ret code not 200')
         }
