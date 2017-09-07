@@ -298,7 +298,6 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 headers
             })
             resObject.songs[0].maxbr = resObject.privileges[0].maxbr
-            console.log(resObject.privileges[0])
             song = this.translateRawToSong(resObject.songs, true, resObject.privileges)[0]
             try {
                 song.lyrics = await this.getSongLyrics(songId)
@@ -322,7 +321,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     public async getPlayingUrl(songId: string, withCookie?: string, sendPlayLog?: boolean): Promise<Wukong.IFile[]> {
         let results = this.musicFilesCache.get(songId + withCookie) as Wukong.IFile[]
         if (results) {
-            console.log(`${this.providerName}.${songId} getPlayingUrl use cached result`, results)
+            console.info(`${this.providerName}.${songId} getPlayingUrl use cached result`, results)
             return results
         }
 
@@ -392,7 +391,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
                 headers
             })
             if (resObject && resObject.code === 200) {
-                console.log('sendPlayLog is finished for: ' + (await this.getUserInfo(headers)).name)
+                console.info('sendPlayLog is finished for: ' + (await this.getUserInfo(headers)).name)
                 return
             } else {
                 console.error('sendPlayLog unknown return: ', JSON.stringify(resObject))
