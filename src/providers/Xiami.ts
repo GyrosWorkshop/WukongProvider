@@ -116,18 +116,18 @@ export default class XiamiMusicProvider extends BaseProvider {
         return songs
     }
 
-    async getSongLyrics(url: string): Promise<Wukong.ILyric[]> {
+    async getSongLyrics(uri: string): Promise<Wukong.ILyric[]> {
         try {
-            const res = await this.sendRequest({
-                url: url
-            })
+            const res = await this.sendRequest({uri})
             return [{
                 lrc: this.isLrcFormat(res),
                 translated: false,
                 data: res
             } as Wukong.ILyric]
-        } catch (err) {}
-        return null
+        } catch (e) {
+            console.error('xiami getSongLyrics ' + uri, e)
+            return null
+        }
     }
 
     public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
@@ -146,7 +146,7 @@ export default class XiamiMusicProvider extends BaseProvider {
 
     private async searchSongsOnlne(token: string, key: string): Promise<Array<Wukong.ISong>> {
         const res: any = await this.sendRequest({
-            url: 'http://api.xiami.com/web',
+            uri: 'http://api.xiami.com/web',
             json: true,
             qs: {
                 key,
