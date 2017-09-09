@@ -364,7 +364,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         } else {
             results = [{
                 unavailable: true,
-                file: 'https://main.cdn.wukongmusic.us/avstatic/unavailable.mp3?--153'
+                file: 'https://redir.senorsen.com/WukongMediaUnavailable'
             }]
         }
         return results
