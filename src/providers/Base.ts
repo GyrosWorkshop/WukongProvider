@@ -58,9 +58,9 @@ abstract class BaseMusicProvider {
     protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong> {
         try {
             const key = this.getSongRedisKey(this.providerName, songId)
-            const data = JSON.parse(await Bluebird.promisify(this.redis.get, {
+            const data = this.formatRow(JSON.parse(await Bluebird.promisify(this.redis.get, {
                 context: this.redis
-            })(key))
+            })(key)))
             if (data) {
                 console.info(`Cache HIT for ${key}`)
                 if (needDetail) {
@@ -108,6 +108,7 @@ abstract class BaseMusicProvider {
 
     abstract getWebUrl(songId: string): string
     private formatRow(song: Wukong.ISong | any): Wukong.ISong {
+        if (!song) return null
         if (_.isString(song.artwork)) song.artwork = { file: song.artwork }
         song.webUrl = this.getWebUrl(song.songId)
         return song

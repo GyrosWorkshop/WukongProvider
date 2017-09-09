@@ -1,6 +1,6 @@
 {
   "name": "wukong-provider",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "The universal music provider for Wukong Music.",
   "main": "index.js",
   "scripts": {
