@@ -96,8 +96,7 @@ export default class QQMusicProvider extends BaseProvider {
 
     async getSingleSongOnline(songId: string): Promise<Wukong.ISong> {
         const song = {} as Wukong.ISong
-        const baseInfo = await this.getBaseInfo(songId)
-        const info = baseInfo.data[0]
+        const info = await this.getBaseInfo(songId)
         song.album = info.album.name
         song.artist = info.singer.map((it: any) => it.name).join(' / ')
         song.title = info.title
@@ -114,7 +113,8 @@ export default class QQMusicProvider extends BaseProvider {
     private getAllFiles(baseInfoFile: any): any {
         const definedQualityTypes = [
             // [ 999000, 'size_flac',   'flac', 'F000' ],      // dummy bitrate value
-            // [ 320000, 'size_320mp3', 'mp3',  'M800' ],
+            // Flac not working now.
+            [ 320000, 'size_320mp3', 'mp3',  'M800' ],
             // [ 192000, 'size_192ogg', 'ogg' ],
             // [ 192000, 'size_192aac', 'aac' ],
             [ 128000, 'size_128mp3', 'mp3',  'M500' ],
@@ -133,7 +133,7 @@ export default class QQMusicProvider extends BaseProvider {
 
     private getMaxAvailBitrate(baseInfoFile: any): any {
         const bitrateKeyOrder = [
-            // [ 320000, 'size_320mp3', 'mp3', 'M800' ],
+            [ 320000, 'size_320mp3', 'mp3', 'M800' ],
             // [ 192000, 'size_192ogg', 'ogg' ],
             // [ 192000, 'size_192aac', 'aac' ],
             [ 128000, 'size_128mp3', 'mp3', 'M500' ],
@@ -188,7 +188,7 @@ export default class QQMusicProvider extends BaseProvider {
                 Host: 'c.y.qq.com'
             }
         })
-        return JSON.parse(res)
+        return JSON.parse(res).data[0]
     }
 
     private getArtworkUrl(imgId: string): string {
@@ -197,28 +197,18 @@ export default class QQMusicProvider extends BaseProvider {
 
     public async getPlayingUrl(songId: string, withCookie?: string): Promise<Wukong.IFile[]> {
         const guid = Math.floor(Math.random() * 9999999999)
-        const result: string = await this.sendRequest({
-            uri: 'http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg',
-            qs: {
-                json: 3,
-                loginUin: 0,
-                format: 'jsonp',
-                inCharset: 'utf-8',
-                outCharset: 'utf-8',
-                notice: 0,
-                platform: 'yqq',
-                needNewCode: 0,
-                guid
-            }
+        const keyrequest = await this.sendRequest({
+            uri: `https://c.y.qq.com/base/fcgi-bin/fcg_musicexpress.fcg?json=3&guid=${guid.toString()}`
         })
+        const key: string = JSON.parse(keyrequest.replace(/^jsonCallback\((.*)\);$/, '$1')).key
         const baseInfo: any = await this.getBaseInfo(songId)
         const rawFiles = this.getAllFiles(baseInfo.file)
-        const key: string = JSON.parse(result.replace(/^jsonCallback\((.*)\);$/, '$1')).key
+        
         return rawFiles.map((it: any) => ({
             audioBitrate: it.bitrate,
             audioQuality: this.parseAudioQuality(it.bitrate),
             type: it.extension,
-            file: `http://cc.stream.qqmusic.qq.com/${it.prefix}${songId}.${it.extension}?vkey=${key}&guid=${guid}&fromtag=0`
+            file: `https://dl.stream.qqmusic.qq.com/${it.prefix}${songId}.${it.extension}?vkey=${key}&guid=${guid}&fromtag=30`
         }))
     }
 

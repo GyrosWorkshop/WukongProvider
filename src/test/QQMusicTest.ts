@@ -4,7 +4,7 @@ import QQMusicProvider from '../providers/QQMusic'
 describe('QQMusicProvider', () => {
     const provider = new QQMusicProvider()
     describe('getSongInfo', () => {
-        it('曹操', async () => {
+        it('曹操 0003y8uR1ZZwOI', async () => {
             const song = await provider.getSongInfo('0003y8uR1ZZwOI')
             assert.equal(song.siteId, 'QQMusic')
             assert.equal(song.album, '曹操')
@@ -13,9 +13,7 @@ describe('QQMusicProvider', () => {
             assert.equal(song.songId, '0003y8uR1ZZwOI')
             assert.equal(song.length, 242000)
         })
-    })
-    describe('getSongInfo 000sxzol11raSd', () => {
-        it('周杰伦的床边故事', async () => {
+        it('周杰伦的床边故事 000sxzol11raSd', async () => {
             const song = await provider.getSongInfo('000sxzol11raSd')
             assert.equal(song.siteId, 'QQMusic')
             assert.equal(song.album, '周杰伦的床边故事')
@@ -23,6 +21,11 @@ describe('QQMusicProvider', () => {
             assert.equal(song.title, '不该 (with aMEI)')
             assert.equal(song.songId, '000sxzol11raSd')
             assert.equal(song.length, 290000)
+        })
+    })
+    describe('playing url', () => {
+        it('曹操 0003y8uR1ZZwOI', async () => {
+            const url = await provider.getPlayingUrl('0003y8uR1ZZwOI')
         })
     })
     describe('searchMusic', () => {
