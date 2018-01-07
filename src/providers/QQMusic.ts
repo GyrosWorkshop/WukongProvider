@@ -97,15 +97,16 @@ export default class QQMusicProvider extends BaseProvider {
     async getSingleSongOnline(songId: string): Promise<Wukong.ISong> {
         const song = {} as Wukong.ISong
         const baseInfo = await this.getBaseInfo(songId)
-        song.album = baseInfo.album.name
-        song.artist = baseInfo.singer.map((it: any) => it.name).join(' / ')
-        song.title = baseInfo.title
-        song.length = Math.floor(parseFloat(baseInfo.interval) * 1000)
+        const info = baseInfo.data[0]
+        song.album = info.album.name
+        song.artist = info.singer.map((it: any) => it.name).join(' / ')
+        song.title = info.title
+        song.length = Math.floor(parseFloat(info.interval) * 1000)
         song.siteId = this.providerName
         song.songId = songId
-        song.artwork = { file: this.getArtworkUrl(baseInfo.album.mid) }
+        song.artwork = { file: this.getArtworkUrl(info.album.mid) }
         song.webUrl = this.getWebUrl(songId)
-        song.bitrate = this.getMaxAvailBitrate(baseInfo.file).bitrate
+        song.bitrate = this.getMaxAvailBitrate(info.file).bitrate
         song.lyrics = await this.getSongLyrics(songId)
         return song
     }
@@ -175,20 +176,19 @@ export default class QQMusicProvider extends BaseProvider {
         return song
     }
 
-    async getBaseInfo(songId: string): Promise<any> {
+    async getBaseInfo(mid: string): Promise<any> {
         const res = await this.sendRequest({
-            uri: 'http://i.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg',
+            uri: 'https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg',
             qs: {
-                'songmid': songId,
-                'tpl': 'yqq_song_detail'
+                songmid: mid,
+                format: 'json',
+            },
+            headers: {
+                Referer: 'https://y.qq.com/portal/search.html',
+                Host: 'c.y.qq.com'
             }
         })
-        const window = await new Promise((resolve, reject) => jsdom.env(res, (err, window) => {
-            if (err) reject(err)
-            else resolve(window)
-        })) as Window
-        const data = window.document.getElementById('opt_btns').getElementsByClassName('data')[0].innerHTML
-        return JSON.parse(data)
+        return JSON.parse(res)
     }
 
     private getArtworkUrl(imgId: string): string {
