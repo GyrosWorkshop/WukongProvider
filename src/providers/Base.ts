@@ -1,16 +1,18 @@
+const serverConfig = require('../../server-config.json')
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'
-import { RedisClient } from 'redis';
+import * as Redis from 'redis'
 import * as Bluebird from 'bluebird'
 
 abstract class BaseMusicProvider {
+
+    static redis = Redis.createClient(serverConfig.redis)
+
     /**
      * Return the provider's name, e.g. netease-cloud-music.
      */
     abstract get providerName(): string
-
-    redis: RedisClient
 
     protected RequestOptions: Request.CoreOptions = {
         headers: {
@@ -39,7 +41,7 @@ abstract class BaseMusicProvider {
             if (saveSong.artwork && !_.isString(saveSong.artwork)) saveSong.artwork = (<any>saveSong.artwork).file
             const key = this.getSongRedisKey(song.siteId, song.songId)
             // Cache song for 30d.
-            this.redis.set(key, JSON.stringify(saveSong), 'EX', 3600 * 24 * 30)
+            BaseMusicProvider.redis.set(key, JSON.stringify(saveSong), 'EX', 3600 * 24 * 30)
         } catch (e) {
             // tolerate
             console.error(`save err ${song.siteId}.${song.songId}`, e)
@@ -58,8 +60,8 @@ abstract class BaseMusicProvider {
     protected async load(songId: string, needDetail?: boolean): Promise<Wukong.ISong> {
         try {
             const key = this.getSongRedisKey(this.providerName, songId)
-            const data = this.formatRow(JSON.parse(await Bluebird.promisify(this.redis.get, {
-                context: this.redis
+            const data = this.formatRow(JSON.parse(await Bluebird.promisify(BaseMusicProvider.redis.get, {
+                context: BaseMusicProvider.redis
             })(key)))
             if (data) {
                 console.info(`Cache HIT for ${key}`)
