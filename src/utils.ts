@@ -35,7 +35,7 @@ function guessFromSongListNetease(url: Url.Url): string {
         url = Url.parse(link)
     }
 
-    const id = qs.parse(url.query).id
+    const id = qs.parse(url.query.toString()).id.toString()
     const pathname = url.pathname
     const parseIdFromPath = (s: string) => /playlist\/(\d+)\/?/.exec(s)[1]
     if (_.some(matches, it => it.test(pathname))) {
