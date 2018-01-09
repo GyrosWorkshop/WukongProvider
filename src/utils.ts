@@ -3,29 +3,25 @@ import * as qs from 'querystring'
 import * as _ from 'lodash'
 
 export function guessFromSongListUrl(link: string): SiteSongList {
-    try {
-        const url = Url.parse(link)
-        let result: SiteSongList
-        switch (url.hostname.toLowerCase()) {
-        case 'music.163.com':
-            result = {
-                siteId: 'netease-cloud-music',
-                songListId: guessFromSongListNetease(url).toString()
-            }
-            break
-        case 'www.xiami.com':
-            result = {
-                siteId: 'Xiami',
-                songListId: guessFromSongListXiami(url).toString()
-            }
-            break
-        default:
-            throw new Error('unknown site or unsupported')
+    const url = Url.parse(link)
+    let result: SiteSongList
+    switch (url.hostname.toLowerCase()) {
+    case 'music.163.com':
+        result = {
+            siteId: 'netease-cloud-music',
+            songListId: guessFromSongListNetease(url).toString()
         }
-        return result
-    } catch (e) {
-        return null
+        break
+    case 'www.xiami.com':
+        result = {
+            siteId: 'Xiami',
+            songListId: guessFromSongListXiami(url).toString()
+        }
+        break
+    default:
+        throw new Error('unknown site or unsupported')
     }
+    return result
 }
 
 function guessFromSongListNetease(url: Url.Url): string {
@@ -35,7 +31,10 @@ function guessFromSongListNetease(url: Url.Url): string {
         url = Url.parse(link)
     }
 
-    const id = qs.parse(url.query.toString()).id.toString()
+    let id = ''
+    try {
+        id = qs.parse(url.query.toString()).id.toString()
+    } catch (e) {}
     const pathname = url.pathname
     const parseIdFromPath = (s: string) => /playlist\/(\d+)\/?/.exec(s)[1]
     if (_.some(matches, it => it.test(pathname))) {
