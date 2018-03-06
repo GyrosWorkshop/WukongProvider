@@ -1,6 +1,6 @@
 {
   "name": "wukong-provider",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "The universal music provider for Wukong Music.",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,7 @@
     "jsdom": "^11.5.1",
     "lodash": "^4.13.1",
     "lru-cache": "^4.0.1",
+    "moment": "^2.21.0",
     "moment-timezone": "^0.5.5",
     "morgan": "^1.7.0",
     "node-cache": "^4.1.1",
