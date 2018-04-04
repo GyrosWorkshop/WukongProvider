@@ -4,6 +4,84 @@ import * as Request from 'request'
 import * as _ from 'lodash'
 import * as Redis from 'redis'
 import * as Bluebird from 'bluebird'
+import * as Capi from 'qcloudapi-sdk'
+import * as uuidv1 from 'uuid/v1'
+
+const capi = new Capi({
+    SecretId: serverConfig.qcloud.id,
+    SecretKey: serverConfig.qcloud.secret,
+    Region: 'gz',
+    serviceType: 'cmq-topic-gz',
+});
+
+const capiRequestPromise = (options: any) => new Promise((resolve, reject) => {
+    capi.request(options, (error: any, data: any) => {
+        if (!!error) reject(error)
+        else resolve(data)
+    })
+})
+
+type CMQMessageCallback = (err: Error | null, content: string) => any
+
+const CMQMessageProcessor = (() => {
+    const waitingQueue: {[key: string]: CMQMessageCallback} = {}
+    return {
+        newTask: (options: Request.OptionsWithUri) => {
+            const key = uuidv1()
+            const msgBody = {
+                key,
+                msg: options
+            }
+            capi.request({
+                Action: 'PublishMessage',
+                topicName: 'wukong',
+                msgBody: JSON.stringify(msgBody)
+            }, (error: any, data: any) => {
+                console.error(error)
+            })
+            return new Promise((resolve, reject) => {
+                // Fixme: timeout
+                const timeout = setTimeout(() => {
+                    reject("timeout")
+                }, 8 * 1000)
+                waitingQueue[key] = (err: Error | null, content: string) => {
+                    clearTimeout(timeout)
+                    if (!!err) {
+                        reject(err)
+                    } else {
+                        resolve(content)
+                    }
+                }
+            })
+        },
+        finishTask: (key: string, err: Error | null, content: string) => {
+            const callback = waitingQueue[key]
+            if (!!callback) {
+                waitingQueue[key] = null
+                callback(err, content)
+            }
+        }
+    }
+})()
+
+const pullingMessage = () => {
+    capi.request({
+        Action: 'ReceiveMessage',
+        queueName: 'wukong-callback',
+    }, {
+        serviceType: 'cmq-queue-gz',
+    }, (error: any, data: any) => {
+        try {
+            const msg = JSON.parse(data.msgBody)
+            const {key, error, content} = msg
+            const body = !error && content && content.body
+            if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+        } finally {
+            setImmediate(pullingMessage)
+        }
+    })
+}
+pullingMessage()
 
 abstract class BaseMusicProvider {
 
@@ -25,7 +103,7 @@ abstract class BaseMusicProvider {
     protected sendRequest(options: Request.OptionsWithUri): PromiseLike<any> {
         const defaultOption = _.merge(_.cloneDeep(this.RequestOptions), options)
         console.info(`Send request by ${this.providerName}: ${options.uri}`)
-        return rp(defaultOption)
+        return CMQMessageProcessor.newTask(defaultOption)
     }
 
     private getSongRedisKey(siteId: string, songId: string): string {
@@ -118,4 +196,4 @@ abstract class BaseMusicProvider {
 }
 
 export default BaseMusicProvider
-export {Request}
+export {Request, CMQMessageProcessor}

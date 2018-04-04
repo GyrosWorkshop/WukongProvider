@@ -38,9 +38,11 @@
     "moment-timezone": "^0.5.5",
     "morgan": "^1.7.0",
     "node-cache": "^4.1.1",
+    "qcloudapi-sdk": "^0.1.6",
     "redis": "^2.8.0",
     "request": "^2.83.0",
-    "request-promise": "^4.2.0"
+    "request-promise": "^4.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.8",
@@ -58,6 +60,7 @@
     "@types/pg": "^7.4.1",
     "@types/redis": "^2.6.0",
     "@types/request-promise": "^4.1.33",
+    "@types/uuid": "^3.4.3",
     "apidoc": "^0.17.5",
     "async": "^2.0.0-rc.6",
     "bigint-typescript-definitions": "^5.5.3-0",

@@ -1,7 +1,7 @@
 import NeteaseCloudMusicProvider from './providers/NeteaseCloudMusic'
 import QQMusicProvider from './providers/QQMusic'
 import XiamiProvider from './providers/Xiami'
-import BaseMusicProvider from './providers/Base'
+import BaseMusicProvider, {CMQMessageProcessor} from './providers/Base'
 import {guessFromSongListUrl} from './utils'
 
 import * as _ from 'lodash'
@@ -47,6 +47,7 @@ class Controller {
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
         app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
     }
+
     /**
      * @api {POST} /api/searchSongs search songs
      * @apiName SearchSongs
