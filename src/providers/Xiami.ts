@@ -2,7 +2,6 @@ import BaseProvider, {Request} from './Base'
 import {autobind} from 'core-decorators'
 import * as _ from 'lodash'
 import {AllHtmlEntities} from 'html-entities'
-const serverConfig = require('../../server-config.json')
 
 @autobind
 export default class XiamiMusicProvider extends BaseProvider {
@@ -16,9 +15,6 @@ export default class XiamiMusicProvider extends BaseProvider {
     constructor() {
         super()
         this.entities = new AllHtmlEntities()
-        if (serverConfig.useCookie && _.isString(serverConfig.useCookie.Xiami)) {
-            this.sessionCookie = serverConfig.useCookie['Xiami']
-        }
     }
 
     private getCookieHeader(cookie: string | any): any {

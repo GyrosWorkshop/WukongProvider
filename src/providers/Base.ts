@@ -1,4 +1,3 @@
-const serverConfig = require('../../server-config.json')
 import * as rp from 'request-promise'
 import * as Request from 'request'
 import * as _ from 'lodash'
@@ -8,8 +7,8 @@ import * as uuidv1 from 'uuid/v1'
 const Capi = require('qcloudapi-sdk')
 
 const capi = new Capi({
-    SecretId: serverConfig.qcloud.id,
-    SecretKey: serverConfig.qcloud.secret,
+    SecretId: process.env.qqcloudId,
+    SecretKey: process.env.qqcloudSecret,
     Region: 'gz',
     serviceType: 'cmq-topic-gz',
 })
@@ -85,7 +84,7 @@ pullingMessage()
 
 abstract class BaseMusicProvider {
 
-    static redis = Redis.createClient(serverConfig.redis)
+    static redis = Redis.createClient(6379, 'localhost')
 
     /**
      * Return the provider's name, e.g. netease-cloud-music.
