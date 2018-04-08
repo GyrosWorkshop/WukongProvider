@@ -4,7 +4,7 @@
   "description": "The universal music provider for Wukong Music.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers ts:ts-node/register -t 10000",
+    "test": "mocha --compilers ts:ts-node/register -t 16000",
     "testapi": "env api=1 npm run test",
     "start": "node lib/index.js",
     "dev": "env TS_NODE_FAST=1 TS_NODE_CACHE_DIRECTORY=tmp ts-node src/index.ts",
