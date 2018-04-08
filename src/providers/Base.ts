@@ -4,15 +4,15 @@ import * as Request from 'request'
 import * as _ from 'lodash'
 import * as Redis from 'redis'
 import * as Bluebird from 'bluebird'
-import * as Capi from 'qcloudapi-sdk'
 import * as uuidv1 from 'uuid/v1'
+const Capi = require('qcloudapi-sdk')
 
 const capi = new Capi({
     SecretId: serverConfig.qcloud.id,
     SecretKey: serverConfig.qcloud.secret,
     Region: 'gz',
     serviceType: 'cmq-topic-gz',
-});
+})
 
 const capiRequestPromise = (options: any) => new Promise((resolve, reject) => {
     capi.request(options, (error: any, data: any) => {
@@ -42,7 +42,7 @@ const CMQMessageProcessor = (() => {
             return new Promise((resolve, reject) => {
                 // Fixme: timeout
                 const timeout = setTimeout(() => {
-                    reject("timeout")
+                    reject('timeout')
                 }, 8 * 1000)
                 waitingQueue[key] = (err: Error | null, content: string) => {
                     clearTimeout(timeout)
