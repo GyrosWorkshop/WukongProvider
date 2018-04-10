@@ -14,7 +14,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return 'netease-cloud-music'
     }
 
-    static apiPrefix = 'http://music.163.com'
+    static apiPrefix = 'https://music.163.com'
     static binCdn: null = null
     static imageSize = 400
 

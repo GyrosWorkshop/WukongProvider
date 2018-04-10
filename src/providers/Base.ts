@@ -39,7 +39,6 @@ const CMQMessageProcessor = (() => {
                 console.error(error)
             })
             return new Promise((resolve, reject) => {
-                // Fixme: timeout
                 const timeout = setTimeout(() => {
                     waitingQueue[key] = null
                     reject('timeout')
