@@ -4,7 +4,6 @@ import * as Request from 'request'
 import * as CryptoJS from 'crypto-js'
 import BaseMusicProvider from './Base'
 const moment = require('moment-timezone')
-const serverConfig = require('../../server-config.json')
 const bigint = require('BigInt')
 const NodeCache = require('node-cache')
 
@@ -15,8 +14,8 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         return 'netease-cloud-music'
     }
 
-    static apiPrefix = serverConfig['netease-cloud-music-api-prefix']
-    static binCdn = serverConfig['netease-cloud-music-bin-cdn']
+    static apiPrefix = 'https://music.163.com'
+    static binCdn: null = null
     static imageSize = 400
 
     // from: https://github.com/Zazama/Netease-Downloader/blob/master/index.html

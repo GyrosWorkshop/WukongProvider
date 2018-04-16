@@ -3,12 +3,5 @@
     "provider": ["QQMusic", "netease-cloud-music"],
     "netease-cloud-music-api-prefix": "http://music.163.com",
     "netease-cloud-music-bin-cdn": null,
-    "trust_proxy": "127.0.0.1",
-    "redis": {
-      "host": "127.0.0.1",
-      "port": 6379,
-      "password": "dummypassword",
-      "db": 0,
-      "prefix": "wukong-provider:"
-    }
+    "trust_proxy": "127.0.0.1"
 }

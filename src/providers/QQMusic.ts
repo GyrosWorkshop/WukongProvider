@@ -203,7 +203,7 @@ export default class QQMusicProvider extends BaseProvider {
         const key: string = JSON.parse(keyrequest.replace(/^jsonCallback\((.*)\);$/, '$1')).key
         const baseInfo: any = await this.getBaseInfo(songId)
         const rawFiles = this.getAllFiles(baseInfo.file)
-        
+
         return rawFiles.map((it: any) => ({
             audioBitrate: it.bitrate,
             audioQuality: this.parseAudioQuality(it.bitrate),

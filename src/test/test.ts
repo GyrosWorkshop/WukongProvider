@@ -1,7 +1,6 @@
-const serverConfig = require('../../server-config.json')
 import * as Redis from 'redis'
 // Flush db before run test.
-Redis.createClient(serverConfig.redis).flushdb()
+Redis.createClient(6379, 'localhost').flushdb()
 
 if (process.env.api) {
     require('./ApiTest')

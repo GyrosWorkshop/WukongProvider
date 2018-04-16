@@ -1,7 +1,7 @@
 import NeteaseCloudMusicProvider from './providers/NeteaseCloudMusic'
 import QQMusicProvider from './providers/QQMusic'
 import XiamiProvider from './providers/Xiami'
-import BaseMusicProvider from './providers/Base'
+import BaseMusicProvider, {CMQMessageProcessor} from './providers/Base'
 import {guessFromSongListUrl} from './utils'
 
 import * as _ from 'lodash'
@@ -13,15 +13,9 @@ import * as rp from 'request-promise'
 import {autobind} from 'core-decorators'
 
 const version = require('../package.json').version
-const serverConfig = require('../server-config.json')
 const app = express()
 
 app.use(bodyParser.json())
-if (process.env.TRUST_PROXY) {
-    app.set('trust proxy', process.env.TRUST_PROXY)
-} else if (serverConfig.trust_proxy) {
-    app.set('trust proxy', serverConfig.trust_proxy)
-}
 app.use(morgan('combined'))
 app.use((req, res, next) => {
     res.set('X-Wukong-Provider-Version', version)
@@ -47,6 +41,7 @@ class Controller {
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
         app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
     }
+
     /**
      * @api {POST} /api/searchSongs search songs
      * @apiName SearchSongs
