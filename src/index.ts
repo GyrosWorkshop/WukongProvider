@@ -10,7 +10,12 @@ import * as morgan from 'morgan'
 import * as http from 'http'
 import * as bodyParser from 'body-parser'
 import * as rp from 'request-promise'
+import * as request from 'request'
+import * as URL from 'url'
+import * as DNS from 'dns'
 import {autobind} from 'core-decorators'
+
+DNS.setServers(['1.2.4.8'])
 
 const version = require('../package.json').version
 const app = express()
@@ -40,6 +45,7 @@ class Controller {
         app.post('/api/userSongLists', this.wrap(this.userSongLists))
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
         app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
+        app.get('/api/proxy', this.proxy)
     }
 
     /**
@@ -227,6 +233,36 @@ class Controller {
         const result = await Promise.all<Wukong.IThirdPartyUser[]>([...providers].map(([, it]) => it.searchUsers(key, withCookie)))
         const data = Array.prototype.concat.apply([], _.zip.apply(null, result)).filter((it: any) => !!it)
         return data
+    }
+
+    async proxy(req: express.Request, res: express.Response) {
+        const {url} = req.query as {
+            url: string
+        }
+        // const message = await CMQMessageProcessor.newTask({url}, 'dns')
+        // const {ip} = JSON.parse(message)
+        const u = new URL.URL(url)
+        const ip = await new Promise<string[]>((resolve, reject) => {
+            DNS.resolve4(u.hostname, (err, address) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(address)
+                }
+            })
+        })
+        const host = u.host
+        if (!host.endsWith("126.net")) {
+            throw "error"
+        }
+        u.host = ip[0]
+        request({
+            url: u.toString(),
+            headers: {
+                'User-Agent': req.header('User-Agent'),
+                'Host': host
+            }
+        }).pipe(res)
     }
 
     private wrap(fn: Function) {
