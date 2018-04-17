@@ -89,7 +89,7 @@ pullingMessage()
 
 abstract class BaseMusicProvider {
 
-    static redis = env == 'development' ? RedisMock.createClient() : Redis.createClient(6379, 'localhost')
+    static redis = env == 'development' ? RedisMock.createClient() : Redis.createClient(6379, 'redis')
     /**
      * Return the provider's name, e.g. netease-cloud-music.
      */
