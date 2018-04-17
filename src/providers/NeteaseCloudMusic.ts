@@ -6,7 +6,6 @@ import BaseMusicProvider from './Base'
 const moment = require('moment-timezone')
 const bigint = require('BigInt')
 const NodeCache = require('node-cache')
-const serverConfig = require('../../server-config.json')
 const queryString = require('querystring')
 
 moment.tz.setDefault('Asia/Shanghai')
@@ -17,7 +16,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     static apiPrefix = 'https://music.163.com'
-    static binCdn = serverConfig['netease-cloud-music-bin-cdn']
+    static binCdn = process.env.proxy
     static imageSize = 400
 
     // from: https://github.com/Zazama/Netease-Downloader/blob/master/index.html
