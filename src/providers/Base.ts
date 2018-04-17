@@ -84,7 +84,7 @@ pullingMessage()
 
 abstract class BaseMusicProvider {
 
-    static redis = Redis.createClient(6379, 'localhost')
+    static redis = Redis.createClient(6379, 'redis')
 
     /**
      * Return the provider's name, e.g. netease-cloud-music.

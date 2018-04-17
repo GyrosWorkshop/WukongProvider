@@ -4,7 +4,9 @@
 	"compilerOptions": {
 		"target": "es6",
 		"module": "commonjs",
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"sourceRoot": "./src",
+		"outDir": "./lib"
 	},
 	"exclude": ["node_modules"]
 }
