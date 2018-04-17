@@ -4,7 +4,9 @@ import * as _ from 'lodash'
 import * as Redis from 'redis'
 import * as Bluebird from 'bluebird'
 import * as uuidv1 from 'uuid/v1'
+import * as RedisMock from 'redis-mock'
 const Capi = require('qcloudapi-sdk')
+const env = process.env.NODE_ENV || 'development'
 
 const capi = new Capi({
     SecretId: process.env.qqcloudId,
@@ -43,7 +45,7 @@ const CMQMessageProcessor = (() => {
                 const timeout = setTimeout(() => {
                     waitingQueue[key] = null
                     reject('timeout')
-                }, 15 * 1000)
+                }, 200 * 1000)
                 waitingQueue[key] = (err: Error | null, content: string) => {
                     clearTimeout(timeout)
                     if (!!err) {
@@ -72,10 +74,12 @@ const pullingMessage = () => {
         serviceType: 'cmq-queue-gz',
     }, (error: any, data: any) => {
         try {
-            const msg = JSON.parse(data.msgBody)
-            const {key, error, content} = msg
-            const body = !error && content && content.body
-            if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+            if (data.code == 0) {
+                const msg = JSON.parse(data.msgBody)
+                const { key, error, content } = msg
+                const body = !error && content && content.body
+                if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+            }
         } finally {
             setImmediate(pullingMessage)
         }
@@ -85,8 +89,7 @@ pullingMessage()
 
 abstract class BaseMusicProvider {
 
-    static redis = Redis.createClient(6379, 'redis')
-
+    static redis = env == 'development' ? RedisMock.createClient() : Redis.createClient(6379, 'localhost')
     /**
      * Return the provider's name, e.g. netease-cloud-music.
      */

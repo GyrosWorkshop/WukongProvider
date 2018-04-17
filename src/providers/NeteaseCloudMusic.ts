@@ -6,6 +6,8 @@ import BaseMusicProvider from './Base'
 const moment = require('moment-timezone')
 const bigint = require('BigInt')
 const NodeCache = require('node-cache')
+const serverConfig = require('../../server-config.json')
+const queryString = require('querystring')
 
 moment.tz.setDefault('Asia/Shanghai')
 
@@ -15,7 +17,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     }
 
     static apiPrefix = 'https://music.163.com'
-    static binCdn: null = null
+    static binCdn = serverConfig['netease-cloud-music-bin-cdn']
     static imageSize = 400
 
     // from: https://github.com/Zazama/Netease-Downloader/blob/master/index.html
@@ -150,7 +152,9 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             if (!o.pc && privileges && privileges[i].pl === 0) available = false
 
             if (NeteaseCloudMusicProvider.binCdn && musicUrl) {
-                musicUrl = musicUrl.replace(/^http:\/\//, NeteaseCloudMusicProvider.binCdn + '/')
+                musicUrl = NeteaseCloudMusicProvider.binCdn + '?' + queryString.stringify({
+                    'url': musicUrl
+                })
             }
             const songLength = o.dt
             const songId = o.id.toString()
@@ -173,7 +177,9 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
     private getFiles(url: string | null): Wukong.IFile {
         return url ? {
             file: url,
-            fileViaCdn: url.replace(/^https?:\/\//, NeteaseCloudMusicProvider.binCdn + '/') + (url.indexOf('?') === -1 ? '?' : '&') + 'cachecdn=1'
+            fileViaCdn: NeteaseCloudMusicProvider.binCdn + '?' + queryString.stringify({
+                'url': url
+            })
         } : null
     }
 
@@ -306,7 +312,10 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             Object.assign(song, {meta: JSON.stringify(resObject.songs[0]), detail: true})
             song.mvId = resObject.songs[0].mv.toString()
             if (song.mvId === '0') song.mvId = ''
+            console.log("BALA")
+            console.log(song)
             await this.save(song)
+            console.log("FAFA")
             if (!song) return null
         } else {
             if (song.artwork) song.artwork = this.getFiles(song.artwork.file)
