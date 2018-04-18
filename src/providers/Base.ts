@@ -68,19 +68,30 @@ const CMQMessageProcessor = (() => {
 
 const pullingMessage = () => {
     capi.request({
-        Action: 'ReceiveMessage',
+        Action: 'BatchReceiveMessage',
         queueName: 'wukong-callback',
+        numOfMsg: 16,
+        pollingWaitSeconds: 30,
     }, {
         serviceType: 'cmq-queue-gz',
     }, (error: any, data: any) => {
+        const handleIds: {[index: string]: string} = {}
         try {
             if (data.code == 0) {
-                const msg = JSON.parse(data.msgBody)
-                const { key, error, content } = msg
-                const body = !error && content && content.body
-                if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+                data.msgInfoList.forEach((value: {msgId: string, msgBody: string, receiptHandle: string}, index: number) => {
+                    handleIds[`receiptHandle.${index}`] = value.receiptHandle
+                    const msg = JSON.parse(value.msgBody)
+                    const { key, error, content } = msg
+                    const body = !error && content && content.body
+                    if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+                })
             }
         } finally {
+            capi.request({
+                Action: 'BatchDeleteMessage',
+                queueName: 'wukong-callback',
+                ...handleIds
+            }, () => {})
             setImmediate(pullingMessage)
         }
     })
