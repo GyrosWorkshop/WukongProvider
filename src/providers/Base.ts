@@ -91,7 +91,11 @@ const pullingMessage = () => {
                 Action: 'BatchDeleteMessage',
                 queueName: 'wukong-callback',
                 ...handleIds
-            }, () => {})
+            }, {
+                serviceType: 'cmq-queue-gz',
+            }, (error: any, data: any) => {
+                console.log(data)
+            })
             setImmediate(pullingMessage)
         }
     })
