@@ -243,13 +243,23 @@ class Controller {
         // const {ip} = JSON.parse(message)
         const u = new URL.URL(url)
         const ip = await new Promise<string[]>((resolve, reject) => {
-            DNS.resolve4(u.hostname, (err, address) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve(address)
-                }
-            })
+            if (u.hostname == "p1.music.126.net" ||
+                u.hostname == "p3.music.126.net" ||
+                u.hostname == "p4.music.126.net") {
+                resolve(["116.207.132.220"])
+            }
+            else if (u.hostname == "m10.music.126.net") {
+                resolve(["111.178.233.111"])
+            }
+            else {
+                DNS.resolve4(u.hostname, (err, address) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(address)
+                    }
+                })
+            }
         })
         const host = u.host
         if (!host.endsWith("126.net")) {
