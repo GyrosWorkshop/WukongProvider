@@ -27,11 +27,10 @@ type CMQMessageCallback = (err: Error | null, content: string) => any
 const CMQMessageProcessor = (() => {
     const waitingQueue: {[key: string]: CMQMessageCallback} = {}
     return {
-        newTask: (options: Request.OptionsWithUri | {url: string}, type: 'request' | 'dns' = 'request'): Promise<string> => {
+        newTask: (options: Request.OptionsWithUri | {url: string): Promise<string> => {
             const key = uuidv1()
             const msgBody = {
                 key,
-                type,
                 msg: options
             }
             capi.request({
