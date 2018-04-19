@@ -38,6 +38,9 @@ providers.set(xiamiProvider.providerName, xiamiProvider)
 
 @autobind
 class Controller {
+
+    static HOSTNAME_MAP = new Map<string, string>()
+
     constructor(app: express.Application) {
         app.post('/api/searchSongs', this.wrap(this.searchSongs))
         app.post('/api/songInfo', this.wrap(this.songInfo))
@@ -46,6 +49,11 @@ class Controller {
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
         app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
         app.get('/api/proxy', this.proxy)
+
+        Controller.HOSTNAME_MAP.set('p1.music.126.net', '116.207.132.220')
+        Controller.HOSTNAME_MAP.set('p3.music.126.net', '116.207.132.220')
+        Controller.HOSTNAME_MAP.set('p4.music.126.net', '116.207.132.220')
+        Controller.HOSTNAME_MAP.set('m10.music.126.net', '111.178.233.111')
     }
 
     /**
@@ -242,30 +250,25 @@ class Controller {
         // const message = await CMQMessageProcessor.newTask({url}, 'dns')
         // const {ip} = JSON.parse(message)
         const u = new URL.URL(url)
-        const ip = await new Promise<string[]>((resolve, reject) => {
-            if (u.hostname === 'p1.music.126.net' ||
-                u.hostname === 'p3.music.126.net' ||
-                u.hostname === 'p4.music.126.net') {
-                resolve(['116.207.132.220'])
-            }
-            else if (u.hostname === 'm10.music.126.net') {
-                resolve(['111.178.233.111'])
-            }
-            else {
-                DNS.resolve4(u.hostname, (err, address) => {
+        const host = u.hostname
+        if (!host.endsWith('126.net')) {
+            throw 'error'
+        }
+
+        let ip = Controller.HOSTNAME_MAP.get(host)
+        if (!ip) {
+            ip = (await new Promise<string[]>((resolve, reject) => {
+                DNS.resolve4(host, (err, address) => {
                     if (err) {
                         reject(err)
                     } else {
                         resolve(address)
                     }
                 })
-            }
-        })
-        const host = u.host
-        if (!host.endsWith('126.net')) {
-            throw 'error'
+            }))[0]
         }
-        u.host = ip[0]
+
+        u.host = ip
         request({
             url: u.toString(),
             headers: {
