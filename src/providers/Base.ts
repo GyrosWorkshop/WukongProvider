@@ -27,7 +27,7 @@ type CMQMessageCallback = (err: Error | null, content: string) => any
 const CMQMessageProcessor = (() => {
     const waitingQueue: {[key: string]: CMQMessageCallback} = {}
     return {
-        newTask: (options: Request.OptionsWithUri | {url: string): Promise<string> => {
+        newTask: (options: Request.OptionsWithUri | {url: string}): Promise<string> => {
             const key = uuidv1()
             const msgBody = {
                 key,
@@ -76,7 +76,7 @@ const pullingMessage = () => {
     }, (error: any, data: any) => {
         const handleIds: {[index: string]: string} = {}
         try {
-            if (data.code == 0) {
+            if (data.code === 0) {
                 data.msgInfoList.forEach((value: {msgId: string, msgBody: string, receiptHandle: string}, index: number) => {
                     handleIds[`receiptHandle.${index}`] = value.receiptHandle
                     const msg = JSON.parse(value.msgBody)
@@ -103,7 +103,7 @@ pullingMessage()
 
 abstract class BaseMusicProvider {
 
-    static redis = env == 'development' ? RedisMock.createClient() : Redis.createClient(6379, 'redis')
+    static redis = env === 'development' ? RedisMock.createClient() : Redis.createClient(6379, 'redis')
     /**
      * Return the provider's name, e.g. netease-cloud-music.
      */

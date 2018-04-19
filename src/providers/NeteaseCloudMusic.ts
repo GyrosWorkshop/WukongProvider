@@ -311,10 +311,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             Object.assign(song, {meta: JSON.stringify(resObject.songs[0]), detail: true})
             song.mvId = resObject.songs[0].mv.toString()
             if (song.mvId === '0') song.mvId = ''
-            console.log("BALA")
-            console.log(song)
             await this.save(song)
-            console.log("FAFA")
             if (!song) return null
         } else {
             if (song.artwork) song.artwork = this.getFiles(song.artwork.file)
