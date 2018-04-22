@@ -251,7 +251,7 @@ class Controller {
         // const {ip} = JSON.parse(message)
         const u = new URL.URL(url)
         const host = u.hostname
-        if (!host.endsWith('126.net')) {
+        if (!host.endsWith('.music.126.net')) {
             throw 'error'
         }
 
