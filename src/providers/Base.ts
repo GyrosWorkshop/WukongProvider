@@ -65,11 +65,10 @@ const CMQMessageProcessor = (() => {
     }
 })()
 
-const timeoutIds: Array<NodeJS.Timer> = []
+let timeoutId: NodeJS.Timer = null
 const pullingMessage = () => {
-    timeoutIds.forEach((it) => clearTimeout(it))
-    timeoutIds.length = 0 // Black magic, but it works.
-    timeoutIds.push(setTimeout(pullingMessage, 30 * 1000))
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(pullingMessage, 30 * 1000)
 
     capi.request({
         Action: 'BatchReceiveMessage',
@@ -91,7 +90,9 @@ const pullingMessage = () => {
                 })
             }
         } finally {
-            timeoutIds.push(setTimeout(pullingMessage, 0))
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(pullingMessage, 0)
+
             if (Object.keys(handleIds).length !== 0) {
                 capi.request({
                     Action: 'BatchDeleteMessage',
@@ -106,7 +107,7 @@ const pullingMessage = () => {
         }
     })
 }
-timeoutIds.push(setTimeout(pullingMessage, 0))
+timeoutId = setTimeout(pullingMessage, 0)
 
 abstract class BaseMusicProvider {
 
