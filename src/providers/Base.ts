@@ -65,7 +65,11 @@ const CMQMessageProcessor = (() => {
     }
 })()
 
+let timeoutId: NodeJS.Timer = null
 const pullingMessage = () => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(pullingMessage, 30 * 1000)
+
     capi.request({
         Action: 'BatchReceiveMessage',
         queueName: 'wukong-callback',
@@ -86,20 +90,24 @@ const pullingMessage = () => {
                 })
             }
         } finally {
-            capi.request({
-                Action: 'BatchDeleteMessage',
-                queueName: 'wukong-callback',
-                ...handleIds
-            }, {
-                serviceType: 'cmq-queue-gz',
-            }, (error: any, data: any) => {
-                console.log(data)
-            })
-            setImmediate(pullingMessage)
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(pullingMessage, 0)
+
+            if (Object.keys(handleIds).length !== 0) {
+                capi.request({
+                    Action: 'BatchDeleteMessage',
+                    queueName: 'wukong-callback',
+                    ...handleIds
+                }, {
+                    serviceType: 'cmq-queue-gz',
+                }, (error: any, data: any) => {
+                    console.log(data)
+                })
+            }
         }
     })
 }
-pullingMessage()
+timeoutId = setTimeout(pullingMessage, 0)
 
 abstract class BaseMusicProvider {
 
