@@ -1,4 +1,4 @@
-import * as rp from 'request-promise'
+import * as zlib from 'zlib'
 import * as Request from 'request'
 import * as _ from 'lodash'
 import * as Redis from 'redis'
@@ -13,13 +13,6 @@ const capi = new Capi({
     SecretKey: process.env.qqcloudSecret,
     Region: 'gz',
     serviceType: 'cmq-topic-gz',
-})
-
-const capiRequestPromise = (options: any) => new Promise((resolve, reject) => {
-    capi.request(options, (error: any, data: any) => {
-        if (!!error) reject(error)
-        else resolve(data)
-    })
 })
 
 type CMQMessageCallback = (err: Error | null, content: string) => any
@@ -83,10 +76,19 @@ const pullingMessage = () => {
             if (data.code === 0) {
                 data.msgInfoList.forEach((value: {msgId: string, msgBody: string, receiptHandle: string}, index: number) => {
                     handleIds[`receiptHandle.${index}`] = value.receiptHandle
-                    const msg = JSON.parse(value.msgBody)
-                    const { key, error, content } = msg
-                    const body = !error && content && content.body
-                    if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+                    zlib.inflate(new Buffer(value.msgBody, 'base64'), (err, result) => {
+                        let data
+                        if (err) {
+                            console.error(err)
+                            data = value.msgBody
+                        } else {
+                            data = result.toString('utf8')
+                        }
+                        const msg = JSON.parse(data)
+                        const { key, error, content } = msg
+                        const body = !error && content && content.body
+                        if (!!key) CMQMessageProcessor.finishTask(key, error, body)
+                    })
                 })
             }
         } finally {
