@@ -32,7 +32,7 @@ const qqProvider = new QQMusicProvider()
 const neteaseProvider = new NeteaseCloudMusicProvider()
 const xiamiProvider = new XiamiProvider()
 
-//providers.set(qqProvider.providerName, qqProvider)
+// providers.set(qqProvider.providerName, qqProvider)
 providers.set(neteaseProvider.providerName, neteaseProvider)
 providers.set(xiamiProvider.providerName, xiamiProvider)
 
