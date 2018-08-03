@@ -368,7 +368,7 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
         } else {
             results = [{
                 unavailable: true,
-                file: 'https://raw.githubusercontent.com/GyrosWorkshop/WukongDesign/master/Assets/unavailable.mp3'
+                file: 'https://wukong.leeleo.me/unavailable.mp3'
             }]
         }
         return results
