@@ -3,6 +3,7 @@ import * as _ from 'lodash'
 import * as Request from 'request'
 import * as CryptoJS from 'crypto-js'
 import BaseMusicProvider from './Base'
+import baseCookie from './NeteaseMusicBaseCookie'
 const moment = require('moment-timezone')
 const bigint = require('BigInt')
 const NodeCache = require('node-cache')
@@ -240,13 +241,16 @@ class NeteaseCloudMusicProvider extends BaseMusicProvider {
             if (_.isString(cookie)) {
                 const validCookieMatch = /MUSIC_U=[^;]+/.exec(cookie)
                 if (validCookieMatch) return {
-                    Cookie: String(validCookieMatch)
+                    Cookie: `${baseCookie}; ${String(validCookieMatch)}`
                 }
             } else if (cookie.Cookie) {
+                cookie.cookie = `${baseCookie}; ${cookie.cookie}`
                 return cookie
             }
         }
-        return {}
+        return {
+            Cookie: baseCookie
+        }
     }
 
     public async searchSongs(searchKey: string, withCookie?: string): Promise<Wukong.ISong[]> {
