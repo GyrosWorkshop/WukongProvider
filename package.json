@@ -53,7 +53,7 @@
     "@types/crypto-js": "^3.1.42",
     "@types/express": "^4.16.0",
     "@types/html-entities": "^1.2.16",
-    "@types/jsdom": "^11.0.6",
+    "@types/jsdom": "^12.2.0",
     "@types/lodash": "^4.14.113",
     "@types/mocha": "^5.2.5",
     "@types/morgan": "^1.7.35",
