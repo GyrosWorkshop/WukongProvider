@@ -53,7 +53,7 @@ class Controller {
         Controller.HOSTNAME_MAP.set('p1.music.126.net', '116.207.132.220')
         Controller.HOSTNAME_MAP.set('p3.music.126.net', '116.207.132.220')
         Controller.HOSTNAME_MAP.set('p4.music.126.net', '116.207.132.220')
-        Controller.HOSTNAME_MAP.set('m10.music.126.net', '111.178.233.111')
+        Controller.HOSTNAME_MAP.set('m10.music.126.net', '113.96.172.85')
     }
 
     /**
