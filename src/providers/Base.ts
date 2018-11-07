@@ -23,6 +23,7 @@ const CMQMessageProcessor = (() => {
         newTask: (options: Request.OptionsWithUri | {url: string}): Promise<string> => {
             const key = uuidv1()
             const msgBody = {
+                type: 'HTTP',
                 key,
                 msg: options
             }
