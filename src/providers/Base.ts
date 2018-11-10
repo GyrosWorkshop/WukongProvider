@@ -5,6 +5,7 @@ import * as Redis from 'redis'
 import * as Bluebird from 'bluebird'
 import * as uuidv1 from 'uuid/v1'
 import * as RedisMock from 'redis-mock'
+import { hostname } from 'os';
 const Capi = require('qcloudapi-sdk')
 const env = process.env.NODE_ENV || 'development'
 
@@ -19,35 +20,41 @@ type CMQMessageCallback = (err: Error | null, content: string) => any
 
 const CMQMessageProcessor = (() => {
     const waitingQueue: {[key: string]: CMQMessageCallback} = {}
-    return {
-        newTask: (options: Request.OptionsWithUri | {url: string}): Promise<string> => {
-            const key = uuidv1()
-            const msgBody = {
-                type: 'HTTP',
-                key,
-                msg: options
-            }
-            capi.request({
-                Action: 'PublishMessage',
-                topicName: 'wukong',
-                msgBody: JSON.stringify(msgBody)
-            }, (error: any, data: any) => {
-                console.error(error)
-            })
-            return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    waitingQueue[key] = null
-                    reject('timeout')
-                }, 200 * 1000)
-                waitingQueue[key] = (err: Error | null, content: string) => {
-                    clearTimeout(timeout)
-                    if (!!err) {
-                        reject(err)
-                    } else {
-                        resolve(content)
-                    }
+    const newTask = (msg: any, type: 'DNS' | 'HTTP'): Promise<any> => {
+        const key = uuidv1()
+        const msgBody = {
+            type: type,
+            key,
+            msg: msg,
+        }
+        capi.request({
+            Action: 'PublishMessage',
+            topicName: 'wukong',
+            msgBody: JSON.stringify(msgBody)
+        }, (error: any, data: any) => {
+            console.error(error)
+        })
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                waitingQueue[key] = null
+                reject('timeout')
+            }, 200 * 1000)
+            waitingQueue[key] = (err: Error | null, content: string) => {
+                clearTimeout(timeout)
+                if (!!err) {
+                    reject(err)
+                } else {
+                    resolve(content)
                 }
-            })
+            }
+        })
+    }
+    return {
+        newHttpRequest: (options: Request.OptionsWithUri | {url: string}): Promise<string> => {
+            return newTask(options, 'HTTP')
+        },
+        newDnsRequest: (hostname: string): Promise<string[]> => {
+            return newTask(hostname, 'DNS')
         },
         finishTask: (key: string, err: Error | null, content: string) => {
             const callback = waitingQueue[key]
@@ -131,7 +138,7 @@ abstract class BaseMusicProvider {
     protected sendRequest(options: Request.OptionsWithUri): PromiseLike<any> {
         const defaultOption = _.merge(_.cloneDeep(this.RequestOptions), options)
         console.info(`Send request by ${this.providerName}: ${options.uri}`)
-        return CMQMessageProcessor.newTask(defaultOption)
+        return CMQMessageProcessor.newHttpRequest(defaultOption)
     }
 
     private getSongRedisKey(siteId: string, songId: string): string {

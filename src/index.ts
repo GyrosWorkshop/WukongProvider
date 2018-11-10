@@ -9,13 +9,9 @@ import * as express from 'express'
 import * as morgan from 'morgan'
 import * as http from 'http'
 import * as bodyParser from 'body-parser'
-import * as rp from 'request-promise'
 import * as request from 'request'
 import * as URL from 'url'
-import * as DNS from 'dns'
 import {autobind} from 'core-decorators'
-
-DNS.setServers(['1.2.4.8'])
 
 const version = require('../package.json').version
 const app = express()
@@ -39,8 +35,6 @@ providers.set(xiamiProvider.providerName, xiamiProvider)
 @autobind
 class Controller {
 
-    static HOSTNAME_MAP = new Map<string, string>()
-
     constructor(app: express.Application) {
         app.post('/api/searchSongs', this.wrap(this.searchSongs))
         app.post('/api/songInfo', this.wrap(this.songInfo))
@@ -49,11 +43,6 @@ class Controller {
         app.post('/api/searchUsers', this.wrap(this.searchUsers))
         app.post('/api/songListWithUrl', this.wrap(this.songListWithUrl))
         app.get('/api/proxy', this.proxy)
-
-        Controller.HOSTNAME_MAP.set('p1.music.126.net', '116.207.132.220')
-        Controller.HOSTNAME_MAP.set('p3.music.126.net', '116.207.132.220')
-        Controller.HOSTNAME_MAP.set('p4.music.126.net', '116.207.132.220')
-        Controller.HOSTNAME_MAP.set('m10.music.126.net', '113.96.172.85')
     }
 
     /**
@@ -255,20 +244,8 @@ class Controller {
             throw 'error'
         }
 
-        let ip = Controller.HOSTNAME_MAP.get(host)
-        if (!ip) {
-            ip = (await new Promise<string[]>((resolve, reject) => {
-                DNS.resolve4(host, (err, address) => {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(address)
-                    }
-                })
-            }))[0]
-        }
-
-        u.host = ip
+        const ip = await CMQMessageProcessor.newDnsRequest(host)
+        u.host = ip[0]
         request({
             url: u.toString(),
             headers: {
