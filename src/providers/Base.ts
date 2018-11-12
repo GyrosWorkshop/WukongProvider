@@ -5,7 +5,6 @@ import * as Redis from 'redis'
 import * as Bluebird from 'bluebird'
 import * as uuidv1 from 'uuid/v1'
 import * as RedisMock from 'redis-mock'
-import { hostname } from 'os';
 const Capi = require('qcloudapi-sdk')
 const env = process.env.NODE_ENV || 'development'
 
