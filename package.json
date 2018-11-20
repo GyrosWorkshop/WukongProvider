@@ -59,7 +59,7 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.12.2",
     "@types/pg": "^7.4.11",
-    "@types/redis": "^2.8.7",
+    "@types/redis": "2.8.7",
     "@types/redis-mock": "^0.17.0",
     "@types/request-promise": "^4.1.42",
     "@types/uuid": "^3.4.4",
